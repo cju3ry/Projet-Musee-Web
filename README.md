@@ -36,4 +36,4 @@ Dans cette SAÉ, nous devions faire la refonte complète du site Internet permet
 
 Board : https://github.com/users/cju3ry/projects/1/views/1
   
-Drive : https://drive.google.com/drive/folders/1SxHm2qvpsQL-I7ZHzMXP_Hy8kYxvtpMt
+Drive : https://drive.google.com/drive/folders/0AMKNMZuqF6_-Uk9PVA
