@@ -34,6 +34,6 @@ Dans cette SAÉ, nous devions faire la refonte complète du site Internet permet
 | Cazor--Bonnet Adrian | Chesnier Quentin  | Juery Clément  | Ladureau Baptiste  |
 | Product Owner        | Scrum Master      | Développeur    | Développeur        |
 
-Board : https://github.com/users/cju3ry/projects/1/views/1
+Board : https://github.com/users/cju3ry/projects/7
   
 Drive : https://drive.google.com/drive/folders/0AMKNMZuqF6_-Uk9PVA
