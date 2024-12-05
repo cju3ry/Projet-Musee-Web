@@ -14,7 +14,7 @@ Dans cette SAÉ, nous devions faire la refonte complète du site Internet permet
 
 ## Rôles par itérations : 
 
-| Itération 0 (du 03/12/24 au 08/12/24) ||||
+| Itération 0 (du 29/11/24 au 08/12/24) ||||
 | -------------------- | ----------------- | -------------- | ------------------ |
 | Cazor--Bonnet Adrian | Chesnier Quentin  | Juery Clément  | Ladureau Baptiste  |
 | Développeur          | Product Owner     | Scrum Master   | Développeur        |
