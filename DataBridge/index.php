@@ -89,7 +89,7 @@ try {
                 </div>
             </div>
             <!-- Colonne droite avec l'image -->
-            <div class="col-lg-6 large-image">
+            <div class="col-lg-6 large-image d-none d-sm-block">
             </div>
         </div>
     </div>
