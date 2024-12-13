@@ -1,41 +1,54 @@
-.bordure {
-    border: 3px solid #4CB0D5;
-    border-radius: 10px;
-}
-.raduisInput {
-    border-radius: 10px !important;
-}
-.fondGris{
-    background-color: rgba(195, 195, 195, 0.22);
-}
-.raduisTitle {
-    border-radius: 10px;
-}
-.center-icon {
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+/* Style de la page */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
 }
 
+/* Style pour le logo */
+.logo-large {
+    width: 200px; /* Ajustez cette valeur pour la taille souhaitée */
+    height: auto;
+}
+
+/* Style pour l'image à droite */
+.large-image {
+    background-image: url('../images/imageIndex.jpg');
+    background-size: cover;
+    background-position: center;
+    height: 100vh;
+
+}
+
+/* Style général des boutons et champs de formulaire */
+input.form-control {
+    border-radius: 10px;
+    padding: 10px;
+}
+
+button.btn {
+    border-radius: 10px;
+}
+
+.text-bg-info {
+    background-color: #17a2b8;
+    color: white;
+}
+
+.is-invalid {
+    border-color: red;
+}
+
+.text-danger {
+    color: red;
+}
 .logo-size {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 20px;
-    margin-top: 11px;
+    width: 140px;
+    height: 140px;
 }
-.top-left-centered {
-    position: absolute;
-    top: 0;
-    left: 0;
-    transform: translate(-50%, -50%);
+.margeTitre {
+    margin-bottom: 40px;
 }
-.marginTopDiv {
+.margeBtnSeConnecter {
     margin-top: 20px;
-}
-.marginBottomDiv {
-    margin-bottom: 5px;
-}
-.marginBtn {
-    margin-top: 20px;
-    margin-bottom: 20px;
 }
