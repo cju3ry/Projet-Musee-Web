@@ -65,7 +65,7 @@ try {
                     </div>
                     <div class="text-center fs-2 text-bg-info py-2 rounded mt-3 d-flex align-items-center justify-content-center position-relative text-center fs-1 fw-bold text-bg-info">
                         Authentification
-                        <i class="fa-solid fa-question position-absolute end-0 top-50 translate-middle-y" style="color: #ffffff;">&nbsp;</i>
+                        <i class="fa-solid fa-question position-absolute end-0 top-50 translate-middle-y" title="Entrez votre identifiant puis votre mots de passe pour vous connecter" style="color: #ffffff;">&nbsp;</i>
                     </div>
                     <div class="mt-4">
                         <label for="Identifiant" class="form-label fs-3">Identifiant</label>
