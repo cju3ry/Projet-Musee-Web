@@ -43,9 +43,14 @@ try {
 <head>
     <meta charset="UTF-8">
     <title>Page d'authentification</title>
+    <!--
     <link rel="stylesheet" href="outils/bootstrap-5.3.2-dist/css/bootstrap.css">
-    <link rel="stylesheet" href="CSS/styleIndex.css">
     <link rel="stylesheet" href="outils/fontawesome-free-6.5.1-web/css/all.css">
+    -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="CSS/styleIndex.css">
+
 </head>
 <body>
 <form method="post" action="index.php">
