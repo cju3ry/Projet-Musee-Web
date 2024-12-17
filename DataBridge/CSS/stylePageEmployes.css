@@ -1,0 +1,45 @@
+body {
+    #background-color: #f8f9fa;
+    background-image: url('../images/imageIndex.jpg');
+}
+
+.navbar-brand img {
+    width: 50px;
+    height: auto;
+}
+
+footer {
+    margin-top: 20px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.navbar-transparent {
+    background-color: rgba(255, 255, 255, 0.7); /* Blanc avec une transparence de 70% */
+    backdrop-filter: blur(5px); /* Effet de flou pour un meilleur rendu */
+}
+
+.btn-flottant {
+    position: fixed; /* Fixe le bouton */
+    bottom: 20px;    /* Distance depuis le bas de l'écran */
+    right: 20px;     /* Distance depuis la droite de l'écran */
+    border-radius: 8px; /* Coins légèrement arrondis */
+    padding: 10px 20px; /* Espace interne : haut/bas et gauche/droite */
+    font-size: 18px; /* Taille du texte */
+    display: flex;   /* Pour centrer l'icône avec le texte */
+    align-items: center; /* Alignement vertical */
+    justify-content: center; /* Alignement horizontal */
+    gap: 8px;        /* Espace entre l'icône et le texte */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Ombre pour l'effet flottant */
+    z-index: 1000;   /* Superposition au-dessus des autres éléments */
+    text-decoration: none; /* Supprime le soulignement */
+    color: #fff;     /* Couleur du texte */
+    background-color: #007bff; /* Couleur de fond par défaut de Bootstrap */
+    white-space: nowrap; /* Empêche le texte de passer à la ligne */
+}
+
+.btn-flottant:hover {
+    background-color: #0056b3; /* Couleur plus foncée au survol */
+    color: #fff; /* Texte blanc au survol */
+}
+
