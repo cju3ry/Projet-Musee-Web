@@ -27,7 +27,9 @@
         <!-- Bouton et Login -->
         <div class="text-center">
             <span class="me-3 mt-3 text-white">Adrian CAZOR--BONNET</span><br>
-            <a href="logout.php" class="btn btn-danger mt-3">Se Déconnecter</a><br><br><br>
+            <form method="post" action="logout.php">
+                <button type="submit" class="btn btn-danger mt-3">Se déconnecter</button><br><br><br>
+            </form>
         </div>
     </div>
 </nav>
