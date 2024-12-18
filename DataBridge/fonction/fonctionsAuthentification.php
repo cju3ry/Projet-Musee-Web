@@ -1,9 +1,9 @@
 <?php
 function connecterBd($base) {
-    $host = 'localhost';
+    $host = 'sql8.freesqldatabase.com';
     $db = $base;
-    $user = 'root';
-    $pass = 'root';
+    $user = 'sql8752584';
+    $pass = 'HytVJNeRCy';
     $charset = 'utf8mb4';
     $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
     $options = [
