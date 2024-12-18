@@ -1,8 +1,15 @@
 <?php
     function suppressionEmploye($pdo, $idEmploye) {
-		$stmt = $pdo->prepare("DELETE FROM employe WHERE idEmploye = (:employeId)");
-		$stmt->bindParam(':employeId', $idEmploye);
-		$stmt->execute();
+		try {
+			$pdo->beginTransaction();
+			$stmt1 = $pdo->prepare("DELETE FROM login WHERE idEmploye = (:employeId)");
+			$stmt2 = $pdo->prepare("DELETE FROM employe WHERE idEmploye = (:employeId)");
+			$stmt1->bindParam(':employeId', $idEmploye);
+			$stmt2->bindParam(':employeId', $idEmploye);
+			$stmt->execute();
+		} catch (Exception $e) {
+			$pdo->rollBack();
+		}
 	}
 
     function suppressionVisite($pdo, $idVisite) {
@@ -34,6 +41,12 @@
     function suppressionIndisponibilites($pdo, $idExposition) {
 		$stmt = $pdo->prepare("DELETE FROM indisponibilite WHERE idConferencier = (:conferencierId)");
 		$stmt->bindParam(':conferencierId', $idConferencier);
+		$stmt->execute();
+	}
+
+	function suppressionSpecialites($pdo, $idSpecialite) {
+		$stmt = $pdo->prepare("DELETE FROM specialites WHERE idSpecialite = (:idSpecialite)");
+		$stmt->bindParam(':idSpecialite', $idSpecialite);
 		$stmt->execute();
 	}
 ?>
