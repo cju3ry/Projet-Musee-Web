@@ -14,7 +14,7 @@
 <nav class="navbar navbar-transparent fixed-top">
     <div class="container-fluid d-flex justify-content-between align-items-center">
         <!-- Bouton Hamburger -->
-        <button class="navbar-toggler bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <button id="burgerButton" class="navbar-toggler bg-light" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
@@ -23,7 +23,6 @@
             <img src="../images/logo.png" class="logo-size me-2 w-25" alt="Logo">
             <a class="navbar-brand logo-size mb-0 fs-1 text-white" href="#">DataBridge</a>
         </div>
-
         <!-- Bouton et Login -->
         <div class="text-center">
             <span class="me-3 mt-3 text-white">Adrian CAZOR--BONNET</span><br>
@@ -33,10 +32,59 @@
         </div>
     </div>
 </nav>
+
+<!-- Sidebar (Offcanvas) -->
+<div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasMenu" aria-labelledby="offcanvasMenuLabel">
+    <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="offcanvasMenuLabel">Menu</h5>
+        <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body">
+        <ul class="list-unstyled">
+            <!-- Menu principal -->
+            <li><a href="page_employes.php" class="text-decoration-none">Gestion des Comptes Employés</a></li>
+
+            <!-- Menu avec sous-listes dépliables -->
+            <li>
+                <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+                    Gestion des Conférenciers
+                    <i class="submenu-icon fa fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="text-decoration-none">Ajouter un Conférencier</a></li>
+                    <li><a href="#" class="text-decoration-none">Lister les Conférenciers</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+                    Gestion des Expositions
+                    <i class="submenu-icon fa fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="text-decoration-none">Ajouter une Exposition</a></li>
+                    <li><a href="#" class="text-decoration-none">Lister les Expositions</a></li>
+                </ul>
+            </li>
+
+            <li>
+                <a href="#" class="text-decoration-none d-flex justify-content-between align-items-center">
+                    Gestion des Visites
+                    <i class="submenu-icon fa fa-chevron-right"></i>
+                </a>
+                <ul class="submenu">
+                    <li><a href="#" class="text-decoration-none">Ajouter une Visite</a></li>
+                    <li><a href="#" class="text-decoration-none">Lister les Visites</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+</div>
+
 <!-- Main Content -->
 <div class="container text-center mt-5">
     <h1 class="mb-5 fs-1 text-white fw-bold"><br><br><br>Bienvenue dans le portail de gestion DataBridge</h1>
-    <p class="mb-5 fs-4 text-white fw-bold">S&eacute;lectionnez une cat&eacute;gorie pour commencer.</p>
+    <p class="mb-5 fs-4 text-white fw-bold">Sélectionnez une catégorie pour commencer.</p>
 
     <div class="row row-cols-1 row-cols-md-4 g-4">
         <!-- Gestion des Comptes Employés -->
@@ -50,12 +98,11 @@
                 </div>
             </a>
         </div>
-
         <!-- Gestion des Conférenciers -->
         <div class="col">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body bg-primary text-white rounded">
-                    <h5 class="card-title fs-3 mb-5">Gestion des Conf&eacute;renciers</h5>
+                    <h5 class="card-title fs-3 mb-5">Gestion des Conférenciers</h5>
                     <i class="fas fa-chalkboard-teacher fa-5x mb-3"></i>
                 </div>
             </div>
@@ -75,16 +122,25 @@
         <div class="col">
             <div class="card shadow-sm border-0 h-100">
                 <div class="card-body bg-primary text-white rounded">
-                    <h5 class="card-title fs-3 mb-5">Gestion des <br>Visites</h5>
+                    <h5 class="card-title fs-3 mb-5">Gestion des Visites</h5>
                     <i class="fas fa-clock fa-5x mb-3"></i>
                 </div>
             </div>
         </div>
     </div>
 </div>
+
 <!-- Footer -->
 <footer class="mt-5 text-center py-3 text-white">
-    <p>&copy; 2024 DataBridge. Tous droits r&eacute;serv&eacute;s.</p>
+    <p>&copy; 2024 DataBridge. Tous droits réservés.</p>
 </footer>
+
+<!-- JavaScript files (Popper.js & Bootstrap JS) -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+<!-- Fichier JS externe -->
+<script src="../javaScript/scriptBurger.js"></script>
+
 </body>
 </html>
