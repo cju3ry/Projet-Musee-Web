@@ -33,11 +33,11 @@
         return $tabPrenomEmploye;
     }
 
-    function rechercheEmploye($pdo, $nom, $prenom, $NumTelEmploye) {
-        $requete = "SELECT idEmploye, nomEmploye, prenomEmploye, NumTelEmploye FROM employe ";
+    function rechercheEmploye($pdo, $nom, $prenom, $numTelEmploye) {
+        $requete = "SELECT idEmploye, nomEmploye, prenomEmploye, numTelEmploye FROM employe ";
         $parametre = [];
 
-        if ($nom != "" || $prenom != "" || $NumTelEmploye != "") {
+        if ($nom != "" || $prenom != "" || $numTelEmploye != "") {
 			$requete .= "WHERE";
 		}
 
@@ -59,14 +59,14 @@
             $requete .= $requeteAjout;
 		}
 
-        if ($NumTelEmploye != "" && !$dejaAjoute) {
-			$requeteAjout = " NumTelEmploye LIKE :numTel";
-			$parametre[':numTel'] = $NumTelEmploye;
+        if ($numTelEmploye != "" && !$dejaAjoute) {
+			$requeteAjout = " numTelEmploye LIKE :numTel";
+			$parametre[':numTel'] = $numTelEmploye;
             $requete .= $requeteAjout;
 			$dejaAjoute = true;
-		} else if ($dejaAjoute && $NumTelEmploye != "") {
-			$requeteAjout = " AND NumTelEmploye = :numTel";
-			$parametre[':numTel'] = $NumTelEmploye;
+		} else if ($dejaAjoute && $numTelEmploye != "") {
+			$requeteAjout = " AND numTelEmploye = :numTel";
+			$parametre[':numTel'] = $numTelEmploye;
             $requete .= $requeteAjout;
 		}
 
@@ -87,7 +87,7 @@
                 'idEmploye' => $row['idEmploye'],
 				'nom' => $row['nomEmploye'],
 				'prenom' => $row['prenomEmploye'],
-                'numTel' => $row['NumTelEmploye']
+                'numTel' => $row['numTelEmploye']
 			];
 		}
 	
