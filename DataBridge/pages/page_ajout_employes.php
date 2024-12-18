@@ -47,7 +47,7 @@
             <div class="card shadow p-4 rounded-3">
                 <h2 class="text-center mb-4">Ajouter les informations</h2>
 
-                <form action="modifier_employe.php" method="post">
+                <form action="page_ajout_employes.php" method="post">
                     <!-- Champ Nom -->
                     <div class="mb-3">
                         <label for="nom" class="form-label fw-bold">Nom</label>
@@ -63,7 +63,9 @@
                     <!-- Champ Téléphone -->
                     <div class="mb-3">
                         <label for="telephone" class="form-label fw-bold">Téléphone</label>
-                        <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="06 12 34 56 78" pattern="^0[1-9]([-. ]?[0-9]{2}){4}$" required>
+                        <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="5432" pattern="^[0-9]{4}$"
+                               value="<?php echo htmlentities($telephone, ENT_QUOTES); ?>" required>
+                        <small class="form-text text-muted">Format: 4 chiffres</small>
                     </div>
 
                     <!-- Bouton de soumission -->

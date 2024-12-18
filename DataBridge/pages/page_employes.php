@@ -1,3 +1,30 @@
+<?php
+session_start();
+include("../fonction/fonctionsFiltres.php");
+include("../fonction/fonctionsAuthentification.php");
+include ("../fonction/fonctionsSupression.php");
+$suppresionOk = false;
+try {
+    $pdo = connecterBd('sql8752584');
+    $nomEmp = "";
+    $prenomEmp = "";
+    $numTelEmp = "";
+    $idEmp = "";
+    $tableauEmployes = rechercheEmploye($pdo,$nomEmp,$prenomEmp,$numTelEmp);
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['id_employe']) && isset($_POST['suppresionOk']) && $_POST['suppresionOk'] === 'true') {
+            suppressionEmploye($pdo, $_POST['id_employe']); // Suppression
+            header("Location: page_employes.php"); // Rafraîchissement de la page
+            exit;
+        }
+    }
+
+} catch (PDOException $e) {
+    header('Location: pages/erreurConnexion.php');
+    exit;
+}
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -51,67 +78,79 @@
     </form>
 
     <div class="row row-cols-1 row-cols-md-4 g-4 justify-content-center">
-        <!-- Cardre de l'affichage -->
-        <div class="card shadow-sm border-0 h-100 position-relative me-3">
-            <!-- Icône crayon en haut à droite -->
-            <form method="post" action="page_modif_employes.php">
-                <button class="position-absolute top-0 end-0 m-2 text-primary border-0 bg-transparent">
+        <?php
+        foreach ($tableauEmployes as $employe) {
+            ?>
+            <!-- Cardre de l'affichage -->
+            <div class="card shadow-sm border-0 h-100 position-relative me-3">
+                <!-- Icône crayon en haut à droite -->
+                <form method="post" action="page_modif_employes.php">
+                    <button class="position-absolute top-0 end-0 m-2 text-primary border-0 bg-transparent">
                         <i class="fas fa-pencil-alt fs-4"></i>
-                </button>
-                <?php
-                $nom = "CAZOR--BONNET";
-                $prenom = "Adrian";
-                $telephone = "06 06 06 06 06";
-                echo '<input type="hidden" name="nom_employe" value="' . htmlentities($nom, ENT_QUOTES) . '">';
-                echo '<input type="hidden" name="prenom_employe" value="' . htmlentities($prenom, ENT_QUOTES) . '">';
-                echo '<input type="hidden" name="telephone_employe" value="' . htmlentities($telephone, ENT_QUOTES) . '">';
-                ?>
-            </form>
+                    </button>
+                    <?php
+                    $nom = $employe['nom'];
+                    $prenom = $employe['prenom'];
+                    $telephone = $employe['numTel'];
+                    $idEmp = $employe['idEmploye'];
+                    echo '<input type="hidden" name="nom_employe" value="' . htmlentities($nom, ENT_QUOTES) . '">';
+                    echo '<input type="hidden" name="prenom_employe" value="' . htmlentities($prenom, ENT_QUOTES) . '">';
+                    echo '<input type="hidden" name="telephone_employe" value="' . htmlentities($telephone, ENT_QUOTES) . '">';
+                    echo '<input type="hidden" name="id_employe" value="' . htmlentities($idEmp, ENT_QUOTES) . '">';
+                    ?>
+                </form>
 
-            <!-- Contenu de la card -->
-            <div class="card-body text-black rounded text-start">
-                <span class="fs-5 fw-bold">Identifiant :</span> Mr de blé
-                <br><br><span class="fs-5 fw-bold">Nom :</span> De blé
-                <br><br><span class="fs-5 fw-bold">Prenom :</span> Tonton Farine
-                <br><br><span class="fs-5 fw-bold">Telephone :</span> 06 06 06 06 06
-                <br><br>
-            </div>
+                <!-- Contenu de la card -->
+                <div class="card-body text-black rounded text-start">
+                    <span class="fs-5 fw-bold">Identifiant :</span> <?php echo($employe['idEmploye']) ?>
+                    <br><br><span class="fs-5 fw-bold">Nom :</span> <?php echo($employe['nom']) ?>
+                    <br><br><span class="fs-5 fw-bold">Prenom :</span> <?php echo($employe['prenom']) ?>
+                    <br><br><span class="fs-5 fw-bold">Telephone :</span> <?php echo($employe['numTel']) ?>
+                    <br><br><span class="fs-5 fw-bold">Login :</span> <?php echo($employe['login']) ?>
+                    <br><br><span class="fs-5 fw-bold">Mot de passe :</span> <?php echo($employe['pwd']) ?>
+                    <br><br>
 
-            <!-- Bouton poubelle avec modal -->
-            <a href="#" class="position-absolute bottom-0 end-0 m-2 text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
-                <i class="fas fa-trash-alt fs-4"></i>
-            </a>
+                </div>
+                <!-- Bouton poubelle avec modal -->
+                <a href="#" class="position-absolute bottom-0 end-0 m-2 text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                    <i class="fas fa-trash-alt fs-4"></i>
+                </a>
 
-            <!-- Delete Confirmation Modal -->
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="deleteModalLabel">Confirmation de suppression</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
-                        </div>
-                        <div class="modal-body">
-                            Êtes-vous sûr de vouloir supprimer cet employé ?
-                        </div>
-                        <div class="modal-footer">
-                            <!-- Bouton Annuler -->
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                            <!-- Bouton Confirmer -->
-                            <form method="post" action="suppression_employe.php">
-                                <!--  <input type="hidden" name="id_employe" value="123">  -->
-                                <button type="submit" class="btn btn-danger">Confirmer</button>
-                            </form>
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Confirmation de suppression</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                            </div>
+                            <div class="modal-body">
+                                Êtes-vous sûr de vouloir supprimer cet employé ?
+                            </div>
+                            <div class="modal-footer">
+                                <!-- Bouton Annuler -->
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <!-- Bouton Confirmer -->
+                                <form method="post" action="page_employes.php">
+                                    <input type="hidden" name="id_employe" value="<?php echo htmlentities($employe['idEmploye'], ENT_QUOTES); ?>">
+                                    <input type="hidden" name="suppresionOk" value="true">
+                                    <button type="submit" class="btn btn-danger">Confirmer</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <?php
+        }
+        ?>
     </div>
 </div>
 <!-- Footer -->
 <footer class="mt-5 text-center py-3 text-white">
     <p>&copy; 2024 DataBridge. Tous droits r&eacute;serv&eacute;s.</p>
 </footer>
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
