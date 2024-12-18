@@ -60,7 +60,7 @@
 		}
 
         if ($NumTelEmploye != "" && !$dejaAjoute) {
-			$requeteAjout = " prenoNumTelEmployemEmploye LIKE :numTel";
+			$requeteAjout = " NumTelEmploye LIKE :numTel";
 			$parametre[':numTel'] = $NumTelEmploye;
             $requete .= $requeteAjout;
 			$dejaAjoute = true;
