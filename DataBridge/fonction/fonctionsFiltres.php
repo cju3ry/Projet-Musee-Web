@@ -51,7 +51,7 @@
     }
 
     function rechercheEmploye($pdo, $nom, $prenom, $numTelEmploye) {
-        $requete = "SELECT idEmploye, nomEmploye, prenomEmploye, numTelEmploye, login FROM employe JOIN login ON employe.idEmploye = login.idEmploye ";
+        $requete = "SELECT employe.idEmploye, nomEmploye, prenomEmploye, numTelEmploye, login, pwd FROM employe JOIN login ON employe.idEmploye = login.idEmploye ";
         $parametre = [];
         $dejaAjoute = false;
 
@@ -106,7 +106,8 @@
 				'nom' => $row['nomEmploye'],
 				'prenom' => $row['prenomEmploye'],
                 'numTel' => $row['numTelEmploye'],
-                'login' => $row['login']
+                'login' => $row['login'],
+                'pwd' => $row['pwd']
 			];
 		}
 	
