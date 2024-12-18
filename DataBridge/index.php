@@ -21,7 +21,8 @@ try {
     $pdo = connecterBd('sql8752584');
     if($mdp != "" && $login !="") {
         $tableauLoginEmploye = loginEmploye($pdo, $login, $mdp);
-        setIdEmploye($pdo, getIdEmploye($pdo, $login));
+        $tabIdEmployeAuthentifier = getIdEmploye($pdo, $login);
+        setIdEmploye($tabIdEmployeAuthentifier['idEmploye']);
         $tableauLoginAdmin = loginAdmin($pdo, $login, $mdp);
 
         if(count($tableauLoginEmploye) != 0) {
