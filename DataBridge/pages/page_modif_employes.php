@@ -65,8 +65,9 @@
                     <!-- Champ Téléphone -->
                     <div class="mb-3">
                         <label for="telephone" class="form-label fw-bold">Téléphone</label>
-                        <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="06 12 34 56 78" pattern="^0[1-9]([-. ]?[0-9]{2}){4}$"
+                        <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="5432" pattern="^[0-9]{4}$"
                                value="<?php echo htmlentities($telephone, ENT_QUOTES); ?>" required>
+                        <small class="form-text text-muted">Format: 4 chiffres</small>
                     </div>
 
                     <!-- Bouton de soumission -->
