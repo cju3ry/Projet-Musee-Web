@@ -19,11 +19,15 @@
 	}
 
     function suppressionExposition($pdo, $idExposition) {
-		$stmt = $pdo->prepare("DELETE FROM exposition WHERE idExposition = (:expositionId)");
-		$stmt->bindParam(':expositionId', $idExposition);
-		$stmt->execute();
-
-        suppressionMotCle($pdo, $idConferencier);
+		try {
+			$pdo->beginTransaction();
+			suppressionMotCle($pdo, $idConferencier);
+			$stmt = $pdo->prepare("DELETE FROM exposition WHERE idExposition = (:expositionId)");
+			$stmt->bindParam(':expositionId', $idExposition);
+			$stmt->execute();
+		} catch (Exception $e) {
+			$pdo->rollBack();
+		}
 	}
 
     function suppressionMotCles($pdo, $idExposition) {
@@ -33,9 +37,16 @@
 	}
 
     function suppressionConferencier($pdo, $idConferencier) {
-		$stmt = $pdo->prepare("DELETE FROM conferencier WHERE idConferencier = (:conferencierId)");
-		$stmt->bindParam(':conferencierId', $idConferencier);
-		$stmt->execute();
+		try {
+			$pdo->beginTransaction();
+			suppressionIndisponibilites($pdo, $idExposition);
+			suppressionSpecialites($pdo, $idConferencier);
+			$stmt = $pdo->prepare("DELETE FROM conferencier WHERE idConferencier = (:conferencierId)");
+			$stmt->bindParam(':conferencierId', $idConferencier);
+			$stmt->execute();
+		} catch (Exception $e) {
+			$pdo->rollBack();
+		}
 	}
 
     function suppressionIndisponibilites($pdo, $idExposition) {
@@ -44,9 +55,9 @@
 		$stmt->execute();
 	}
 
-	function suppressionSpecialites($pdo, $idSpecialite) {
-		$stmt = $pdo->prepare("DELETE FROM specialites WHERE idSpecialite = (:idSpecialite)");
-		$stmt->bindParam(':idSpecialite', $idSpecialite);
+	function suppressionSpecialites($pdo, $idConferencier) {
+		$stmt = $pdo->prepare("DELETE FROM specialites WHERE idConferencier = (:idConferencier)");
+		$stmt->bindParam(':idConferencier', $idConferencier);
 		$stmt->execute();
 	}
 ?>
