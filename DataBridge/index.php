@@ -18,10 +18,10 @@ if(isset($_POST['motDePasse'])) {
 }
 
 try {
-    $pdo = connecterBd('databridge');
+    $pdo = connecterBd('sql8752584');
     if($mdp != "" && $login !="") {
         $tableauLoginEmploye = loginEmploye($pdo, $login, $mdp);
-        setIdEmploye(getIdEmploye($pdo, $login));
+        setIdEmploye($pdo, getIdEmploye($pdo, $login));
         $tableauLoginAdmin = loginAdmin($pdo, $login, $mdp);
 
         if(count($tableauLoginEmploye) != 0) {
