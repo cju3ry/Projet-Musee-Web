@@ -3,14 +3,14 @@
         $tabNomEmploye = array();
 
         try {
-            $stmt = $pdo->prepare('SELECT DISTINCT nom FROM employe ORDER BY Type Asc');
+            $stmt = $pdo->prepare('SELECT DISTINCT nomEmploye FROM employe ORDER BY nomEmploye Asc');
             $stmt->execute();
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), (int)$e->getCode());
         }
         
         while ($ligne = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $tabNomEmploye[] = $ligne['nom'];
+            $tabNomEmploye[] = $ligne['nomEmploye'];
         }
 
         return $tabNomEmploye;
@@ -20,17 +20,34 @@
         $tabPrenomEmploye = array();
 
         try {
-            $stmt = $pdo->prepare('SELECT DISTINCT prenom FROM employe ORDER BY Type Asc');
+            $stmt = $pdo->prepare('SELECT DISTINCT prenomEmploye FROM employe ORDER BY prenomEmploye Asc');
             $stmt->execute();
         } catch (PDOException $e) {
             throw new PDOException($e->getMessage(), (int)$e->getCode());
         }
 
         while ($ligne = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $tabPrenomEmploye[] = $ligne['prenom'];
+            $tabPrenomEmploye[] = $ligne['prenomEmploye'];
         }
 
         return $tabPrenomEmploye;
+    }
+
+    function tabNumTel($pdo) {
+        $tabNumTel = array();
+
+        try {
+            $stmt = $pdo->prepare('SELECT DISTINCT numTelEmploye FROM employe ORDER BY numTelEmploye Asc');
+            $stmt->execute();
+        } catch (PDOException $e) {
+            throw new PDOException($e->getMessage(), (int)$e->getCode());
+        }
+
+        while ($ligne = $stmt->fetch(PDO::FETCH_ASSOC)) {
+            $tabNumTel[] = $ligne['numTelEmploye'];
+        }
+
+        return $tabNumTel;
     }
 
     function rechercheEmploye($pdo, $nom, $prenom, $numTelEmploye) {
