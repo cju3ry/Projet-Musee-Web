@@ -34,7 +34,7 @@
     }
 
     function rechercheEmploye($pdo, $nom, $prenom) {
-        $requete = "SELECT nom, prenom FROM employe ";
+        $requete = "SELECT nomEmploye, prenomEmploye FROM employe ";
         $parametre = [];
 
         if ($nom != "" || $prenom != "") {
@@ -42,24 +42,24 @@
 		}
 
         if ($nom != "") {
-			$requeteAjout = " nom LIKE :nom";
+			$requeteAjout = " nomEmploye LIKE :nom";
 			$parametre[':nom'] = $nom;
             $requete .= $requeteAjout;
 			$dejaAjoute = true;
 		}
 
 		if ($prenom != "" && !$dejaAjoute) {
-			$requeteAjout = " prenom LIKE :prenom";
+			$requeteAjout = " prenomEmploye LIKE :prenom";
 			$parametre[':prenom'] = $prenom;
             $requete .= $requeteAjout;
 			$dejaAjoute = true;
 		} else if ($dejaAjoute && $prenom != "") {
-			$requeteAjout = " AND prenom = :prenom";
+			$requeteAjout = " AND prenomEmploye = :prenom";
 			$parametre[':prenom'] = $prenom;
             $requete .= $requeteAjout;
 		}
 
-        $requete .= " ORDER BY nom ASC";
+        $requete .= " ORDER BY nomEmploye ASC";
         
         $stmt = $pdo -> prepare($requete);
 
@@ -73,8 +73,8 @@
 	
 		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
 			$tabEmploye[] = [
-				'nom' => $row['nom'],
-				'prenom' => $row['prenom']
+				'nom' => $row['nomEmploye'],
+				'prenom' => $row['prenomEmploye']
 			];
 		}
 	
