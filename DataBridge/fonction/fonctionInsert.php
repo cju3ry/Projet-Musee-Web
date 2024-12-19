@@ -14,19 +14,53 @@ function insertConferencier($pdo, $nom, $prenom, $specialite, $estEmploye) {
     }
 }
 
-function insertEmploye($pdo, $nom, $prenom, $numTelEmploye) {
+function insertEmploye($pdo, $nom, $prenom, $numTelEmploye, $login, $pwd) {
     try {
-        $requete = "INSERT INTO employe (idEmploye, nomEmploye, prenomEmploye, numTelEmploye) 
-                    VALUES (createIdEmployes() ,:nom, :prenom, :numTelEmploye)";
-        $stmt = $pdo->prepare($requete);
-        $stmt->bindParam(':nom', $nom);
-        $stmt->bindParam(':prenom', $prenom);
-        $stmt->bindParam(':numTelEmploye', $numTelEmploye);
-        $stmt->execute();
+        $pdo->beginTransaction();
+
+        // Insert into employe table
+        $requete1 = "INSERT INTO employe (idEmploye, nomEmploye, prenomEmploye, numTelEmploye)
+                     VALUES (createIdEmployes(), :nom, :prenom, :numTelEmploye)";
+        $stmt1 = $pdo->prepare($requete1);
+        $stmt1->bindParam(':nom', $nom);
+        $stmt1->bindParam(':prenom', $prenom);
+        $stmt1->bindParam(':numTelEmploye', $numTelEmploye);
+        $stmt1->execute();
+
+        // Retrieve the last inserted idEmploye
+        $requete2 = 'SELECT MAX(idEmploye) AS maxId FROM employe';
+        $stmt2 = $pdo->prepare($requete2);
+        $stmt2->execute();
+        $result = $stmt2->fetch(PDO::FETCH_ASSOC);
+        $idEmploye = $result['maxId'];
+
+        // Insert into login table
+        $requete3 = "INSERT INTO login (login, pwd, idEmploye) VALUES (:login, :pwd, :idEmploye)";
+        $stmt3 = $pdo->prepare($requete3);
+        $stmt3->bindParam(':login', $login);
+        $stmt3->bindParam(':pwd', $pwd);
+        $stmt3->bindParam(':idEmploye', $idEmploye);
+        $stmt3->execute();
+
+        $pdo->commit();
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        throw new PDOException($e->getMessage(), (int)$e->getCode());
+    }
+}
+
+function recupLastIdEmploye($pdo) {
+    try {
+        $requete2 = 'SELECT MAX(idEmploye) FROM employe';
+        $stmt2 = $pdo->prepare($requete2);
+        return $stmt2->fetch();
     } catch (PDOException $e) {
         throw new PDOException($e->getMessage(), (int)$e->getCode());
     }
 }
+
+
+
 
 function insertExposition($pdo, $intitule, $periodeDebut, $periodeFin, $nombresOeuvres, $resume, $debutExpoTemp, $finExpoTemp) {
     try {
