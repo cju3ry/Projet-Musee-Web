@@ -1,27 +1,44 @@
 <?php
-    function modifierEmploye($pdo, $idEmploye, $nomEmploye, $prenomEmploye, $numTelEmploye) {
-        try {
-            $pdo->beginTransaction();
-            $stmt = $pdo->prepare('UPDATE employe 
-                                   SET nomEmploye = :nomEmploye,
-                                   prenomEmploye = :prenomEmploye,
-                                   numTelEmploye = :numTelEmploye
-                                   WHERE idEmploye = :idEmploye');
+function modifierEmploye($pdo, $idEmploye, $nomEmploye, $prenomEmploye, $numTelEmploye, $login, $pwd = null) {
+    try {
+        $pdo->beginTransaction();
 
-            $stmt->bindParam(':nomEmploye', $nomEmploye);
-            $stmt->bindParam(':prenomEmploye', $prenomEmploye);
-            $stmt->bindParam(':numTelEmploye', $numTelEmploye);
-            
-            if ($stmt->execute()) {
-                $pdo->commit();
-            }
-            
-            return true;
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-		    return false;
+        // Mise à jour des informations de l'employé
+        $stmt1 = $pdo->prepare('UPDATE employe 
+                               SET nomEmploye = :nomEmploye,
+                                   prenomEmploye = :prenomEmploye,
+                                   NumTelEmploye = :numTelEmploye
+                               WHERE idEmploye = :idEmploye');
+
+        $stmt1->bindParam(':nomEmploye', $nomEmploye);
+        $stmt1->bindParam(':prenomEmploye', $prenomEmploye);
+        $stmt1->bindParam(':numTelEmploye', $numTelEmploye);
+        $stmt1->bindParam(':idEmploye', $idEmploye);
+
+        // Mise à jour du login (et du mot de passe si fourni)
+        $query = 'UPDATE login SET login = :login';
+        if ($pwd !== null) {
+            $query .= ', pwd = :pwd';
         }
+        $query .= ' WHERE idEmploye = :idEmploye';
+
+        $stmt2 = $pdo->prepare($query);
+        $stmt2->bindParam(':login', $login);
+        if ($pwd !== null) {
+            $stmt2->bindParam(':pwd', $pwd);
+        }
+        $stmt2->bindParam(':idEmploye', $idEmploye);
+
+        if ($stmt1->execute() && $stmt2->execute()) {
+            $pdo->commit();
+            return true;
+        }
+
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        return false;
     }
+}
     
     function modifierLogin($pdo, $idLogin, $login, $pwd, $idEmploye) {
         try {
@@ -150,18 +167,19 @@
         }
     }
 
-    function modifierConferencier($pdo, $idEmploye, $nomEmploye, $prenomEmploye, $numTelEmploye) {
+    function modifierConferencier($pdo, $idConferencier, $nomConferencier, $prenomConferencier, $estEmploye) {
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare('UPDATE table 
-                                   SET nomEmploye = :nomEmploye,
-                                   prenomEmploye = :prenomEmploye,
-                                   numTelEmploye = :numTelEmploye
-                                   WHERE idEmploye = :idEmploye');
+            $stmt = $pdo->prepare('UPDATE conferencier 
+                                   SET nomConferencier = :nomConferencier,
+                                   prenomConferencier = :prenomConferencier,
+                                   estEmploye = :estEmploye
+                                   WHERE idConferencier = :idConferencier');
 
-            $stmt->bindParam(':nomEmploye', $nomEmploye);
-            $stmt->bindParam(':prenomEmploye', $prenomEmploye);
-            $stmt->bindParam(':numTelEmploye', $numTelEmploye);
+            $stmt->bindParam(':nomConferencier', $nomConferencier);
+            $stmt->bindParam(':prenomConferencier', $prenomConferencier);
+            $stmt->bindParam(':estEmploye', $estEmploye);
+            $stmt->bindParam(':idConferencier', $idConferencier);
             
             if ($stmt->execute()) {
                 $pdo->commit();
@@ -244,5 +262,29 @@
             $pdo->rollBack();
 		    return false;
         }
+    }
+
+    function verifierChaine($chaine) {
+        if (strlen($chaine) < 8) {
+            return false;
+        }
+    
+        if (!preg_match('/[a-z]/', $chaine)) {
+            return false;
+        }
+    
+        if (!preg_match('/[A-Z]/', $chaine)) {
+            return false;
+        }
+    
+        if (!preg_match('/[0-9]/', $chaine)) {
+            return false;
+        }
+    
+        if (!preg_match('/[\W_]/', $chaine)) { 
+            return false;
+        }
+    
+        return true;
     }
 ?>
