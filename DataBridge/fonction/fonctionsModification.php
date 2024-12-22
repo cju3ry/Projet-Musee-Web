@@ -1,66 +1,42 @@
 <?php
-function modifierEmploye($pdo, $idEmploye, $nomEmploye, $prenomEmploye, $numTelEmploye, $login, $pwd = null) {
-    try {
-        $pdo->beginTransaction();
-
-        // Mise à jour des informations de l'employé
-        $stmt1 = $pdo->prepare('UPDATE employe 
-                               SET nomEmploye = :nomEmploye,
-                                   prenomEmploye = :prenomEmploye,
-                                   NumTelEmploye = :numTelEmploye
-                               WHERE idEmploye = :idEmploye');
-
-        $stmt1->bindParam(':nomEmploye', $nomEmploye);
-        $stmt1->bindParam(':prenomEmploye', $prenomEmploye);
-        $stmt1->bindParam(':numTelEmploye', $numTelEmploye);
-        $stmt1->bindParam(':idEmploye', $idEmploye);
-
-        // Mise à jour du login (et du mot de passe si fourni)
-        $query = 'UPDATE login SET login = :login';
-        if ($pwd !== null) {
-            $query .= ', pwd = :pwd';
-        }
-        $query .= ' WHERE idEmploye = :idEmploye';
-
-        $stmt2 = $pdo->prepare($query);
-        $stmt2->bindParam(':login', $login);
-        if ($pwd !== null) {
-            $stmt2->bindParam(':pwd', $pwd);
-        }
-        $stmt2->bindParam(':idEmploye', $idEmploye);
-
-        if ($stmt1->execute() && $stmt2->execute()) {
-            $pdo->commit();
-            return true;
-        }
-
-    } catch (PDOException $e) {
-        $pdo->rollBack();
-        return false;
-    }
-}
-    
-    function modifierLogin($pdo, $idLogin, $login, $pwd, $idEmploye) {
+    function modifierEmploye($pdo, $idEmploye, $nomEmploye, $prenomEmploye, $numTelEmploye, $login, $pwd = null) {
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare('UPDATE login 
-                                   SET login = :login,
-                                   pwd = :pwd,
-                                   idEmploye = :idEmploye
-                                   WHERE idLogin = :idLogin');
 
-            $stmt->bindParam(':login', $login);
-            $stmt->bindParam(':pwd', $pwd);
-            $stmt->bindParam(':idEmploye', $idEmploye);
-            
-            if ($stmt->execute()) {
-                $pdo->commit();
+            // Mise à jour des informations de l'employé
+            $stmt1 = $pdo->prepare('UPDATE employe 
+                                SET nomEmploye = :nomEmploye,
+                                    prenomEmploye = :prenomEmploye,
+                                    NumTelEmploye = :numTelEmploye
+                                WHERE idEmploye = :idEmploye');
+
+            $stmt1->bindParam(':nomEmploye', $nomEmploye);
+            $stmt1->bindParam(':prenomEmploye', $prenomEmploye);
+            $stmt1->bindParam(':numTelEmploye', $numTelEmploye);
+            $stmt1->bindParam(':idEmploye', $idEmploye);
+
+            // Mise à jour du login (et du mot de passe si fourni)
+            $query = 'UPDATE login SET login = :login';
+            if ($pwd !== null) {
+                $query .= ', pwd = :pwd';
             }
-            
-            return true;
+            $query .= ' WHERE idEmploye = :idEmploye';
+
+            $stmt2 = $pdo->prepare($query);
+            $stmt2->bindParam(':login', $login);
+            if ($pwd !== null) {
+                $stmt2->bindParam(':pwd', $pwd);
+            }
+            $stmt2->bindParam(':idEmploye', $idEmploye);
+
+            if ($stmt1->execute() && $stmt2->execute()) {
+                $pdo->commit();
+                return true;
+            }
+
         } catch (PDOException $e) {
             $pdo->rollBack();
-		    return false;
+            return false;
         }
     }
 
@@ -144,12 +120,12 @@ function modifierEmploye($pdo, $idEmploye, $nomEmploye, $prenomEmploye, $numTelE
             $pdo->beginTransaction();
             $stmt = $pdo->prepare('UPDATE visite
                                    SET dateVisite = :dateVisite,
-                                   heureDebutVisite = :heureDebutVisite,
-                                   intituleVisite = :intituleVisite,
-                                   numTelVisite = :numTelVisite,
-                                   idExposition = :idExposition,
-                                   idConferencier = :idConferencier,
-                                   idEmploye = :idEmploye
+                                       heureDebutVisite = :heureDebutVisite,
+                                       intituleVisite = :intituleVisite,
+                                       numTelVisite = :numTelVisite,
+                                       idExposition = :idExposition,
+                                       idConferencier = :idConferencier,
+                                       idEmploye = :idEmploye
                                    WHERE idEmploye = :idEmploye');
 
             $stmt->bindParam(':nomEmploye', $nomEmploye);
@@ -167,13 +143,68 @@ function modifierEmploye($pdo, $idEmploye, $nomEmploye, $prenomEmploye, $numTelE
         }
     }
 
-    function modifierConferencier($pdo, $idConferencier, $nomConferencier, $prenomConferencier, $estEmploye) {
+    function modifierConferencier($pdo, $idConferencier, $nomConferencier, $prenomConferencier, $estEmploye, $specialites, $indisponibilites) {
         try {
             $pdo->beginTransaction();
+
+            $executeOk = true;
+
+            foreach ($specialites as $specialite) {
+                if ($executeOk) {
+                    $stmt = $pdo->prepare('UPDATE specialites 
+                                    SET intitule = :intitule
+                                    WHERE idSpecialite = :idSpecialite');
+
+                    $stmt->bindParam(':intitule', $specialite['intitule']);
+                    $stmt->bindParam(':idSpecialite', $specialite['id']);
+
+                    if ($stmt->execute()) {
+                        $executeOk = true;
+                    } else {
+                        $executeOk = false;
+                    }
+                }
+            }
+
+            if ($executeOk) {
+                $pdo->commit();
+            } else {
+                $pdo->rollBack();
+		        return false;
+            }
+
+            $executeOk = true;
+
+            foreach ($indisponibilites as $indisponibilite) {
+                if ($executeOk) {
+                    $stmt = $pdo->prepare('UPDATE indisponibilites 
+                                    SET dateDebutIndispo = :dateDebutIndispo,
+                                        dateFinIndispo = :dateFinIndispo
+                                    WHERE idIndisponibilite = :idIndisponibilite');
+
+                    $stmt->bindParam(':dateDebutIndispo', $indisponibilite['debut']);
+                    $stmt->bindParam(':dateFinIndispo', $indisponibilite['fin']);
+                    $stmt->bindParam(':idIndisponibilite', $indisponibilite['id']);
+
+                    if ($stmt->execute()) {
+                        $executeOk = true;
+                    } else {
+                        $executeOk = false;
+                    }
+                }
+            }
+
+            if ($executeOk) {
+                $pdo->commit();
+            } else {
+                $pdo->rollBack();
+		        return false;
+            }
+
             $stmt = $pdo->prepare('UPDATE conferencier 
                                    SET nomConferencier = :nomConferencier,
-                                   prenomConferencier = :prenomConferencier,
-                                   estEmploye = :estEmploye
+                                       prenomConferencier = :prenomConferencier,
+                                       estEmploye = :estEmploye
                                    WHERE idConferencier = :idConferencier');
 
             $stmt->bindParam(':nomConferencier', $nomConferencier);
@@ -192,68 +223,55 @@ function modifierEmploye($pdo, $idEmploye, $nomEmploye, $prenomEmploye, $numTelE
         }
     }
 
-    function modifierExposition($pdo, $idEmploye, $nomEmploye, $prenomEmploye, $numTelEmploye) {
+    function modifierExposition($pdo, $idExposition, $intitule, $nombreOeuvres, $periodeDebut, $periodeFin, $resume, $debutExpoTemp, $finExpoTemp, $motsCles) {
         try {
             $pdo->beginTransaction();
-            $stmt = $pdo->prepare('UPDATE table 
-                                   SET nomEmploye = :nomEmploye,
-                                   prenomEmploye = :prenomEmploye,
-                                   numTelEmploye = :numTelEmploye
-                                   WHERE idEmploye = :idEmploye');
 
-            $stmt->bindParam(':nomEmploye', $nomEmploye);
-            $stmt->bindParam(':prenomEmploye', $prenomEmploye);
-            $stmt->bindParam(':numTelEmploye', $numTelEmploye);
-            
-            if ($stmt->execute()) {
-                $pdo->commit();
+            $executeOk = true;
+
+            foreach ($motsCles as $motCle) {
+                if ($executeOk) {
+                    $stmt = $pdo->prepare('UPDATE motsCle
+                                    SET motCle = :motCle
+                                    WHERE idMotCle = :idMotCle');
+
+                    $stmt->bindParam(':motCle', $motCle['mot']);
+                    $stmt->bindParam(':idMotCle', $motCle['id']);
+
+                    if ($stmt->execute()) {
+                        $executeOk = true;
+                    } else {
+                        $executeOk = false;
+                    }
+                }
             }
-            
-            return true;
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-		    return false;
-        }
-    }
-    
-    function modifierSpecialite($pdo, $idSpecialite, $specialite, $idConferencier) {
-        try {
-            $pdo->beginTransaction();
-            $stmt = $pdo->prepare('UPDATE specialites 
-                                   SET specialite = :specialite,
-                                   idConferencier = :idConferencier
-                                   WHERE idSpecialite = :idSpecialite');
 
-            $stmt->bindParam(':specialite', $nomEmploye);
-            $stmt->bindParam(':idConferencier', $idConferencier);
-            $stmt->bindParam(':idSpecialite', $numTelEmploye);
-            
-            if ($stmt->execute()) {
+            if ($executeOk) {
                 $pdo->commit();
+            } else {
+                $pdo->rollBack();
+		        return false;
             }
-            
-            return true;
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-		    return false;
-        }
-    }
-    
-    function modifierIndispo($pdo, $idIndisponibilite, $dateDebutIndispo, $dateFinIndispo, $idConferencier) {
-        try {
-            $pdo->beginTransaction();
-            $stmt = $pdo->prepare('UPDATE indisponibilites 
-                                   SET dateDebutIndispo = :dateDebutIndispo,
-                                   dateFinIndispo = :dateFinIndispo,
-                                   idConferencier = :idConferencier
-                                   WHERE idIndisponibilite = :idIndisponibilite');
 
-            $stmt->bindParam(':dateDebutIndispo', $dateDebutIndispo);
-            $stmt->bindParam(':dateFinIndispo', $dateFinIndispo);
-            $stmt->bindParam(':idConferencier', $idConferencier);
-            $stmt->bindParam(':idIndisponibilite', $idIndisponibilite);
+            $stmt1 = $pdo->prepare('UPDATE table 
+                                   SET intitule = :intitule,
+                                       nombreOeuvres = :nombreOeuvres,
+                                       periodeDebut = :periodeDebut,
+                                       periodeFin = :periodeFin,
+                                       resume = :resume,
+                                       debutExpoTemp = :debutExpoTemp,
+                                       finExpoTemp = :finExpoTemp
+                                   WHERE idExposition = :idExposition');
+
+            $stmt1->bindParam(':intitule', $intitule);
+            $stmt1->bindParam(':nombreOeuvres', $nombreOeuvres);
+            $stmt1->bindParam(':periodeDebut', $periodeDebut);
+            $stmt1->bindParam(':periodeFin', $periodeFin);
+            $stmt1->bindParam(':resume', $resume);
+            $stmt1->bindParam(':debutExpoTemp', $debutExpoTemp);
+            $stmt1->bindParam(':finExpoTemp', $finExpoTemp);
             
-            if ($stmt->execute()) {
+            if ($stmt1->execute()) {
                 $pdo->commit();
             }
             
