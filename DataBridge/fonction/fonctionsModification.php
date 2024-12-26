@@ -146,139 +146,116 @@
     function modifierConferencier($pdo, $idConferencier, $nomConferencier, $prenomConferencier, $estEmploye, $specialites, $indisponibilites) {
         try {
             $pdo->beginTransaction();
-
-            $executeOk = true;
-
+    
+            // Mise à jour des spécialités
             foreach ($specialites as $specialite) {
-                if ($executeOk) {
-                    $stmt = $pdo->prepare('UPDATE specialites 
-                                    SET intitule = :intitule
-                                    WHERE idSpecialite = :idSpecialite');
-
-                    $stmt->bindParam(':intitule', $specialite['intitule']);
-                    $stmt->bindParam(':idSpecialite', $specialite['id']);
-
-                    if ($stmt->execute()) {
-                        $executeOk = true;
-                    } else {
-                        $executeOk = false;
-                    }
+                $stmt = $pdo->prepare('UPDATE specialites 
+                                       SET intitule = :intitule
+                                       WHERE idSpecialite = :idSpecialite');
+    
+                $stmt->bindParam(':intitule', $specialite['intitule']);
+                $stmt->bindParam(':idSpecialite', $specialite['id']);
+    
+                if (!$stmt->execute()) {
+                    $pdo->rollBack();
+                    return false;
                 }
             }
-
-            if ($executeOk) {
-                $pdo->commit();
-            } else {
-                $pdo->rollBack();
-		        return false;
-            }
-
-            $executeOk = true;
-
+    
+            // Mise à jour des indisponibilités
             foreach ($indisponibilites as $indisponibilite) {
-                if ($executeOk) {
-                    $stmt = $pdo->prepare('UPDATE indisponibilites 
-                                    SET dateDebutIndispo = :dateDebutIndispo,
-                                        dateFinIndispo = :dateFinIndispo
-                                    WHERE idIndisponibilite = :idIndisponibilite');
-
-                    $stmt->bindParam(':dateDebutIndispo', $indisponibilite['debut']);
-                    $stmt->bindParam(':dateFinIndispo', $indisponibilite['fin']);
-                    $stmt->bindParam(':idIndisponibilite', $indisponibilite['id']);
-
-                    if ($stmt->execute()) {
-                        $executeOk = true;
-                    } else {
-                        $executeOk = false;
-                    }
+                $stmt = $pdo->prepare('UPDATE indisponibilites 
+                                       SET dateDebutIndispo = :dateDebutIndispo,
+                                           dateFinIndispo = :dateFinIndispo
+                                       WHERE idIndisponibilite = :idIndisponibilite');
+    
+                $stmt->bindParam(':dateDebutIndispo', $indisponibilite['debut']);
+                $stmt->bindParam(':dateFinIndispo', $indisponibilite['fin']);
+                $stmt->bindParam(':idIndisponibilite', $indisponibilite['id']);
+    
+                if (!$stmt->execute()) {
+                    $pdo->rollBack();
+                    return false;
                 }
             }
-
-            if ($executeOk) {
-                $pdo->commit();
-            } else {
-                $pdo->rollBack();
-		        return false;
-            }
-
+    
+            // Mise à jour des informations du conférencier
             $stmt = $pdo->prepare('UPDATE conferencier 
                                    SET nomConferencier = :nomConferencier,
                                        prenomConferencier = :prenomConferencier,
                                        estEmploye = :estEmploye
                                    WHERE idConferencier = :idConferencier');
-
+    
             $stmt->bindParam(':nomConferencier', $nomConferencier);
             $stmt->bindParam(':prenomConferencier', $prenomConferencier);
             $stmt->bindParam(':estEmploye', $estEmploye);
             $stmt->bindParam(':idConferencier', $idConferencier);
-            
-            if ($stmt->execute()) {
-                $pdo->commit();
+    
+            if (!$stmt->execute()) {
+                $pdo->rollBack();
+                return false;
             }
-            
+    
+            // Commit final
+            $pdo->commit();
             return true;
         } catch (PDOException $e) {
             $pdo->rollBack();
-		    return false;
+            error_log("Erreur lors de la modification du conférencier : " . $e->getMessage());
+            return false;
         }
     }
 
     function modifierExposition($pdo, $idExposition, $intitule, $nombreOeuvres, $periodeDebut, $periodeFin, $resume, $debutExpoTemp, $finExpoTemp, $motsCles) {
         try {
+    
+            // Démarrer une transaction
             $pdo->beginTransaction();
-
-            $executeOk = true;
-
+    
+            // Mise à jour des mots-clés
             foreach ($motsCles as $motCle) {
-                if ($executeOk) {
-                    $stmt = $pdo->prepare('UPDATE motsCle
-                                    SET motCle = :motCle
-                                    WHERE idMotCle = :idMotCle');
-
-                    $stmt->bindParam(':motCle', $motCle['mot']);
-                    $stmt->bindParam(':idMotCle', $motCle['id']);
-
-                    if ($stmt->execute()) {
-                        $executeOk = true;
-                    } else {
-                        $executeOk = false;
-                    }
+                $stmt = $pdo->prepare('UPDATE motsCle
+                                       SET motCle = :motCle
+                                       WHERE idMotCle = :idMotCle');
+                $stmt->bindParam(':motCle', $motCle['mot']);
+                $stmt->bindParam(':idMotCle', $motCle['id']);
+    
+                if (!$stmt->execute()) {
+                    throw new Exception('Échec de la mise à jour des mots-clés.');
                 }
             }
-
-            if ($executeOk) {
-                $pdo->commit();
-            } else {
-                $pdo->rollBack();
-		        return false;
-            }
-
-            $stmt1 = $pdo->prepare('UPDATE table 
-                                   SET intitule = :intitule,
-                                       nombreOeuvres = :nombreOeuvres,
-                                       periodeDebut = :periodeDebut,
-                                       periodeFin = :periodeFin,
-                                       resume = :resume,
-                                       debutExpoTemp = :debutExpoTemp,
-                                       finExpoTemp = :finExpoTemp
-                                   WHERE idExposition = :idExposition');
-
+    
+            // Mise à jour des informations de l'exposition
+            $stmt1 = $pdo->prepare('UPDATE exposition 
+                                    SET intitule = :intitule,
+                                        nombreOeuvres = :nombreOeuvres,
+                                        periodeDebut = :periodeDebut,
+                                        periodeFin = :periodeFin,
+                                        resume = :resume,
+                                        debutExpoTemp = :debutExpoTemp,
+                                        finExpoTemp = :finExpoTemp
+                                    WHERE idExposition = :idExposition');
+    
             $stmt1->bindParam(':intitule', $intitule);
-            $stmt1->bindParam(':nombreOeuvres', $nombreOeuvres);
-            $stmt1->bindParam(':periodeDebut', $periodeDebut);
-            $stmt1->bindParam(':periodeFin', $periodeFin);
+            $stmt1->bindParam(':nombreOeuvres', $nombreOeuvres, PDO::PARAM_INT);
+            $stmt1->bindParam(':periodeDebut', $periodeDebut, PDO::PARAM_INT);
+            $stmt1->bindParam(':periodeFin', $periodeFin, PDO::PARAM_INT);
             $stmt1->bindParam(':resume', $resume);
-            $stmt1->bindParam(':debutExpoTemp', $debutExpoTemp);
-            $stmt1->bindParam(':finExpoTemp', $finExpoTemp);
-            
-            if ($stmt1->execute()) {
-                $pdo->commit();
+            $stmt1->bindValue(':debutExpoTemp', $debutExpoTemp ?: null, PDO::PARAM_STR);
+            $stmt1->bindValue(':finExpoTemp', $finExpoTemp ?: null, PDO::PARAM_STR);
+            $stmt1->bindParam(':idExposition', $idExposition);
+    
+            if (!$stmt1->execute()) {
+                throw new Exception('Échec de la mise à jour de l\'exposition.');
             }
-            
+    
+            // Valider la transaction
+            $pdo->commit();
+    
             return true;
         } catch (PDOException $e) {
             $pdo->rollBack();
-		    return false;
+            return false;
         }
     }
 
