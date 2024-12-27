@@ -52,3 +52,12 @@ button.btn {
 .margeBtnSeConnecter {
     margin-top: 20px;
 }
+
+
+.toggle-password {
+    cursor: pointer;
+}
+
+.margeTitre {
+    margin: 10px;
+}
