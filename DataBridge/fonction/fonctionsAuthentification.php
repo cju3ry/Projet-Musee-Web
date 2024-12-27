@@ -1,9 +1,9 @@
 <?php
-function connecterBd($base) {
-    $host = 'sql8.freesqldatabase.com';
-    $db = $base;
-    $user = 'sql8752584';
-    $pass = 'HytVJNeRCy';
+function connecterBd() {
+    $host = 'localhost';
+    $db = "u842999230_DataBridge";
+    $user = 'u842999230_DataBridgeUser';
+    $pass = '@rI0grw00d_qUeens$@';
     $charset = 'utf8mb4';
     $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
     $options = [

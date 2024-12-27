@@ -49,13 +49,13 @@
         }
     }
 
-
-
-
     function insertExposition($pdo, $intitule, $periodeDebut, $periodeFin, $nombresOeuvres, $resume, $debutExpoTemp, $finExpoTemp) {
         try {
+            $pdo->beginTransaction();
+            
             $requete = "INSERT INTO exposition (idExposition, intitule, periodeDebut, periodeFin, nombreOeuvres, resume, debutExpoTemp, finExpoTemp) 
                         VALUES (createIdExpositions() ,:intitule, :periodeDebut, :periodeFin, :nombresOeuvres, :resume, :debutExpoTemp, :finExpoTemp)";
+                        
             $stmt = $pdo->prepare($requete);
             $stmt->bindParam(':intitule', $intitule);
             $stmt->bindParam(':periodeDebut', $periodeDebut);
@@ -64,14 +64,22 @@
             $stmt->bindParam(':resume', $resume);
             $stmt->bindParam(':debutExpoTemp', $debutExpoTemp);
             $stmt->bindParam(':finExpoTemp', $finExpoTemp);
+            
             $stmt->execute();
+            
+            $pdo->commit();
+            return true;
         } catch (PDOException $e) {
+            $pdo->rollBack();
+            return false;
             throw new PDOException($e->getMessage(), (int)$e->getCode());
         }
     }
-
+    
     function insertIndisponibilites($pdo, $dateDebutIndispo, $dateFinIndispo, $idConferencier) {
         try {
+            $pdo->beginTransaction();
+            
             $requete = "INSERT INTO indisponibilites (dateDebutIndispo, dateFinIndispo, idConferencier) 
                         VALUES (:dateDebutIndispo, :dateFinIndispo, :idConferencier)";
             $stmt = $pdo->prepare($requete);
@@ -79,26 +87,63 @@
             $stmt->bindParam(':dateFinIndispo', $dateFinIndispo);
             $stmt->bindParam(':idConferencier', $idConferencier);
             $stmt->execute();
+            
+            $pdo->commit();
+            return true;
         } catch (PDOException $e) {
+            $pdo->rollBack();
+            return false;
+            throw new PDOException($e->getMessage(), (int)$e->getCode());
+        }
+    }
+
+    function insertSpecialite($pdo, $intitule, $idConferencier) {
+        try {
+            $pdo->beginTransaction();
+            
+            $requete = "INSERT INTO specialites (intitule, idConferencier) 
+                        VALUES (:intitule, :idConferencier)";
+                        
+            $stmt = $pdo->prepare($requete);
+            
+            $stmt->bindParam(':intitule', $intitule);
+            $stmt->bindParam(':idConferencier', $idConferencier);
+            
+            $stmt->execute();
+            
+            $pdo->commit();
+            return true;
+        } catch (PDOException $e) {
+            $pdo->rollBack();
+            return false;
             throw new PDOException($e->getMessage(), (int)$e->getCode());
         }
     }
 
     function insertMotsCles($pdo, $motCle, $idExposition) {
         try {
+            $pdo->beginTransaction();
+            
             $requete = "INSERT INTO motscle (motCle, idExposition) 
                         VALUES (:motCle, :idExposition)";
             $stmt = $pdo->prepare($requete);
             $stmt->bindParam(':motCle', $motCle);
             $stmt->bindParam(':idExposition', $idExposition);
             $stmt->execute();
+            
+            $pdo->commit();
+            return true;
         } catch (PDOException $e) {
+            $pdo->rollBack();
+            return false;
             throw new PDOException($e->getMessage(), (int)$e->getCode());
         }
     }
 
     function insertVisite($pdo, $dateVisite, $heureDebutVisite, $intituleVisite, $numTelVisite, $idExposition, $idConferencier, $idEmploye) {
         try {
+            $pdo->beginTransaction();
+            
             $requete = "INSERT INTO visite (idVisite, dateVisite, heureDebutVisite, intituleVisite, numTelVisite, idExposition, idConferencier, idEmploye) 
                         VALUES (createIdVisites() ,:dateVisite, :heureDebutVisite, :intituleVisite, :numTelVisite, :idExposition, :idConferencier, :idEmploye)";
             $stmt = $pdo->prepare($requete);
@@ -110,26 +155,17 @@
             $stmt->bindParam(':idConferencier', $idConferencier);
             $stmt->bindParam(':idEmploye', $idEmploye);
             $stmt->execute();
+            
+            $pdo->commit();
+            return true;
         } catch (PDOException $e) {
+            $pdo->rollBack();
+            return false;
             throw new PDOException($e->getMessage(), (int)$e->getCode());
         }
     }
 
-    function insertLogin($pdo, $login, $pwd, $idEmploye) {
-        try {
-            $requete = "INSERT INTO login (login, pwd, idEmploye) 
-                        VALUES (:login, :pwd, :idEmploye)";
-            $stmt = $pdo->prepare($requete);
-            $stmt->bindParam(':login', $login);
-            $stmt->bindParam(':pwd', MD5($pwd));
-            $stmt->bindParam(':idEmploye', $idEmploye);
-            $stmt->execute();
-        } catch (PDOException $e) {
-            throw new PDOException($e->getMessage(), (int)$e->getCode());
-        }
-    }
-
-    function verifierChaine($chaine) {
+    function verifierMdp($chaine) {
         if (strlen($chaine) < 8) {
             return false;
         }
