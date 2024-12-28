@@ -51,24 +51,60 @@
 
 
 
+   
+function insertExposition($pdo, $intitule, $periodeDebut, $periodeFin, $nombreOeuvres, $resume, $debutExpoTemp, $finExpoTemp, $motsCles) {
+    try {
+        $pdo->beginTransaction();
+        // Requête pour insérer dans la table `exposition`
+        $queryExposition = "INSERT INTO `exposition` 
+            (`idExposition`, `intitule`, `periodeDebut`, `periodeFin`, `nombreOeuvres`, `resume`, `debutExpoTemp`, `finExpoTemp`) 
+            VALUES (createIdExpositions(), :intitule, :periodeDebut, :periodeFin, :nombreOeuvres, :resume, :debutExpoTemp, :finExpoTemp)";
 
-    function insertExposition($pdo, $intitule, $periodeDebut, $periodeFin, $nombresOeuvres, $resume, $debutExpoTemp, $finExpoTemp) {
+        $stmtExposition = $pdo->prepare($queryExposition);
+        $stmtExposition->execute([
+            ':intitule' => $intitule,
+            ':periodeDebut' => $periodeDebut,
+            ':periodeFin' => $periodeFin,
+            ':nombreOeuvres' => $nombreOeuvres,
+            ':resume' => $resume,
+            ':debutExpoTemp' => $debutExpoTemp,
+            ':finExpoTemp' => $finExpoTemp
+        ]);
+        // Recupérer l'id de l'exposition créée pour l'insertion des mots clés
+        $queryIdExposition = "SELECT MAX(idExposition) AS maxId FROM exposition";
+        $stmtIdExposition = $pdo->prepare($queryIdExposition);
+        $stmtIdExposition->execute();
+        $result = $stmtIdExposition->fetch(PDO::FETCH_ASSOC);
+        $idExposition = $result['maxId'];
+
+        // Séparer les mots-clés par la virgule et supprimer les espaces inutiles
+        $motsClesArray = array_map('trim', explode(',', $motsCles));
+
+        // Préparer la requête pour insérer un mot-clé
+        $query = "INSERT INTO `motsCle` (`motCle`, `idExposition`) 
+              VALUES (:motCle, :idExposition)";
+        $stmt = $pdo->prepare($query);
+
         try {
-            $requete = "INSERT INTO exposition (idExposition, intitule, periodeDebut, periodeFin, nombreOeuvres, resume, debutExpoTemp, finExpoTemp) 
-                        VALUES (createIdExpositions() ,:intitule, :periodeDebut, :periodeFin, :nombresOeuvres, :resume, :debutExpoTemp, :finExpoTemp)";
-            $stmt = $pdo->prepare($requete);
-            $stmt->bindParam(':intitule', $intitule);
-            $stmt->bindParam(':periodeDebut', $periodeDebut);
-            $stmt->bindParam(':periodeFin', $periodeFin);
-            $stmt->bindParam(':nombresOeuvres', $nombresOeuvres);
-            $stmt->bindParam(':resume', $resume);
-            $stmt->bindParam(':debutExpoTemp', $debutExpoTemp);
-            $stmt->bindParam(':finExpoTemp', $finExpoTemp);
-            $stmt->execute();
+            // Boucle pour insérer chaque mot-clé individuellement
+            foreach ($motsClesArray as $motCle) {
+                if (!empty($motCle)) { // Vérifier que le mot-clé n'est pas vide
+                    $stmt->execute([
+                        ':motCle' => $motCle,
+                        ':idExposition' => $idExposition
+                    ]);
+                }
+            }
         } catch (PDOException $e) {
-            throw new PDOException($e->getMessage(), (int)$e->getCode());
+            throw new Exception( "Erreur lors de l'insertion des mots-clés : " . $e->getMessage());
         }
+        $pdo->commit();
+
+    } catch (PDOException $e) {
+        $pdo->rollBack();
+        throw new PDOException("Erreur lors de l'insertion de l'exposition : " . $e->getMessage());
     }
+}
 
     function insertIndisponibilites($pdo, $dateDebutIndispo, $dateFinIndispo, $idConferencier) {
         try {
