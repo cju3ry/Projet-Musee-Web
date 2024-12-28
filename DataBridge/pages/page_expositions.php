@@ -3,6 +3,8 @@ session_start();
 include("../fonction/fonctionsFiltres.php");
 include("../fonction/fonctionsAuthentification.php");
 include ("../fonction/fonctionsSupression.php");
+include ("../fonction/fonctionInsert.php");
+
 $tableauEmployes = "";
 try {
     $pdo = connecterBd();
@@ -168,7 +170,7 @@ try {
     </a>
     -->
 
-    <form method="post" action="page_ajout_employes.php" target="_blank">
+    <form method="post" action="page_ajout_expositions.php" target="_blank">
         <button class="position-absolute top-0 end-0 m-2 text-primary border-0 bg-transparent">
             <a class="btn btn-primary btn-lg position-fixed btn-flottant">
                 <i class="fas fa-user-plus"></i>Ajouter une exposition
