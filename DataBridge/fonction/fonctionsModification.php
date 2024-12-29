@@ -146,120 +146,158 @@
     function modifierConferencier($pdo, $idConferencier, $nomConferencier, $prenomConferencier, $estEmploye, $specialites, $indisponibilites) {
         try {
             $pdo->beginTransaction();
-    
-            // Mise à jour des spécialités
+
+            $executeOk = true;
+
             foreach ($specialites as $specialite) {
-                $stmt = $pdo->prepare('UPDATE specialites 
-                                       SET intitule = :intitule
-                                       WHERE idSpecialite = :idSpecialite');
-    
-                $stmt->bindParam(':intitule', $specialite['intitule']);
-                $stmt->bindParam(':idSpecialite', $specialite['id']);
-    
-                if (!$stmt->execute()) {
-                    $pdo->rollBack();
-                    return false;
+                if ($executeOk) {
+                    $stmt = $pdo->prepare('UPDATE specialites 
+                                    SET intitule = :intitule
+                                    WHERE idSpecialite = :idSpecialite');
+
+                    $stmt->bindParam(':intitule', $specialite['intitule']);
+                    $stmt->bindParam(':idSpecialite', $specialite['id']);
+
+                    if ($stmt->execute()) {
+                        $executeOk = true;
+                    } else {
+                        $executeOk = false;
+                    }
                 }
             }
-    
-            // Mise à jour des indisponibilités
+
+            if ($executeOk) {
+                $pdo->commit();
+            } else {
+                $pdo->rollBack();
+		        return false;
+            }
+
+            $executeOk = true;
+
             foreach ($indisponibilites as $indisponibilite) {
-                $stmt = $pdo->prepare('UPDATE indisponibilites 
-                                       SET dateDebutIndispo = :dateDebutIndispo,
-                                           dateFinIndispo = :dateFinIndispo
-                                       WHERE idIndisponibilite = :idIndisponibilite');
-    
-                $stmt->bindParam(':dateDebutIndispo', $indisponibilite['debut']);
-                $stmt->bindParam(':dateFinIndispo', $indisponibilite['fin']);
-                $stmt->bindParam(':idIndisponibilite', $indisponibilite['id']);
-    
-                if (!$stmt->execute()) {
-                    $pdo->rollBack();
-                    return false;
+                if ($executeOk) {
+                    $stmt = $pdo->prepare('UPDATE indisponibilites 
+                                    SET dateDebutIndispo = :dateDebutIndispo,
+                                        dateFinIndispo = :dateFinIndispo
+                                    WHERE idIndisponibilite = :idIndisponibilite');
+
+                    $stmt->bindParam(':dateDebutIndispo', $indisponibilite['debut']);
+                    $stmt->bindParam(':dateFinIndispo', $indisponibilite['fin']);
+                    $stmt->bindParam(':idIndisponibilite', $indisponibilite['id']);
+
+                    if ($stmt->execute()) {
+                        $executeOk = true;
+                    } else {
+                        $executeOk = false;
+                    }
                 }
             }
-    
-            // Mise à jour des informations du conférencier
+
+            if ($executeOk) {
+                $pdo->commit();
+            } else {
+                $pdo->rollBack();
+		        return false;
+            }
+
             $stmt = $pdo->prepare('UPDATE conferencier 
                                    SET nomConferencier = :nomConferencier,
                                        prenomConferencier = :prenomConferencier,
                                        estEmploye = :estEmploye
                                    WHERE idConferencier = :idConferencier');
-    
+
             $stmt->bindParam(':nomConferencier', $nomConferencier);
             $stmt->bindParam(':prenomConferencier', $prenomConferencier);
             $stmt->bindParam(':estEmploye', $estEmploye);
             $stmt->bindParam(':idConferencier', $idConferencier);
-    
-            if (!$stmt->execute()) {
-                $pdo->rollBack();
-                return false;
+            
+            if ($stmt->execute()) {
+                $pdo->commit();
             }
-    
-            // Commit final
-            $pdo->commit();
+            
             return true;
         } catch (PDOException $e) {
             $pdo->rollBack();
-            error_log("Erreur lors de la modification du conférencier : " . $e->getMessage());
-            return false;
+		    return false;
         }
     }
 
-    function modifierExposition($pdo, $idExposition, $intitule, $nombreOeuvres, $periodeDebut, $periodeFin, $resume, $debutExpoTemp, $finExpoTemp, $motsCles) {
-        try {
-    
-            // Démarrer une transaction
-            $pdo->beginTransaction();
-    
-            // Mise à jour des mots-clés
-            foreach ($motsCles as $motCle) {
-                $stmt = $pdo->prepare('UPDATE motsCle
-                                       SET motCle = :motCle
-                                       WHERE idMotCle = :idMotCle');
-                $stmt->bindParam(':motCle', $motCle['mot']);
-                $stmt->bindParam(':idMotCle', $motCle['id']);
-    
-                if (!$stmt->execute()) {
-                    throw new Exception('Échec de la mise à jour des mots-clés.');
-                }
-            }
-    
-            // Mise à jour des informations de l'exposition
-            $stmt1 = $pdo->prepare('UPDATE exposition 
-                                    SET intitule = :intitule,
-                                        nombreOeuvres = :nombreOeuvres,
-                                        periodeDebut = :periodeDebut,
-                                        periodeFin = :periodeFin,
-                                        resume = :resume,
-                                        debutExpoTemp = :debutExpoTemp,
-                                        finExpoTemp = :finExpoTemp
-                                    WHERE idExposition = :idExposition');
-    
-            $stmt1->bindParam(':intitule', $intitule);
-            $stmt1->bindParam(':nombreOeuvres', $nombreOeuvres, PDO::PARAM_INT);
-            $stmt1->bindParam(':periodeDebut', $periodeDebut, PDO::PARAM_INT);
-            $stmt1->bindParam(':periodeFin', $periodeFin, PDO::PARAM_INT);
-            $stmt1->bindParam(':resume', $resume);
-            $stmt1->bindValue(':debutExpoTemp', $debutExpoTemp ?: null, PDO::PARAM_STR);
-            $stmt1->bindValue(':finExpoTemp', $finExpoTemp ?: null, PDO::PARAM_STR);
-            $stmt1->bindParam(':idExposition', $idExposition);
-    
-            if (!$stmt1->execute()) {
-                throw new Exception('Échec de la mise à jour de l\'exposition.');
-            }
-    
-            // Valider la transaction
-            $pdo->commit();
-    
-            return true;
-        } catch (PDOException $e) {
-            $pdo->rollBack();
-            return false;
-        }
-    }
 
-    function verifierChaine($chaine) {
+
+function modifierExposition($pdo, $idExposition, $intitule, $periodeDebut, $periodeFin,$nombreOeuvres, $resume, $debutExpoTemp, $finExpoTemp,$motsCleStr) {
+    try {
+        // Démarrer la transaction
+        $pdo->beginTransaction();
+
+        // Préparer la requête SQL
+        $sql = "UPDATE exposition 
+                SET intitule = :intitule, 
+                    periodeDebut = :periodeDebut, 
+                    periodeFin = :periodeFin, 
+                    nombreOeuvres = :nombreOeuvres, 
+                    resume = :resume, 
+                    debutExpoTemp = :debutExpoTemp, 
+                    finExpoTemp = :finExpoTemp 
+                WHERE idExposition = :idExposition";
+
+        // Préparer la requête avec PDO
+        $stmt = $pdo->prepare($sql);
+
+        // Associe les valeurs aux paramètres
+        $stmt->bindParam(':intitule', $intitule, PDO::PARAM_STR);
+        $stmt->bindParam(':periodeDebut', $periodeDebut, PDO::PARAM_INT);
+        $stmt->bindParam(':periodeFin', $periodeFin, PDO::PARAM_INT);
+        $stmt->bindParam(':nombreOeuvres', $nombreOeuvres, PDO::PARAM_INT);
+        $stmt->bindParam(':resume', $resume, PDO::PARAM_STR);
+        $stmt->bindParam(':debutExpoTemp', $debutExpoTemp, PDO::PARAM_STR);
+        $stmt->bindParam(':finExpoTemp', $finExpoTemp, PDO::PARAM_STR);
+        $stmt->bindParam(':idExposition', $idExposition, PDO::PARAM_STR);
+
+        // Exécute la requête
+        $stmt->execute();
+
+
+        // Converti la liste des mots-clés en tableau
+        $motsCleArray = array_map('trim', explode(',', $motsCleStr));
+
+        // Supprime les mots-clés qui ne sont plus dans la liste
+        $placeholders = implode(',', array_fill(0, count($motsCleArray), '?'));
+        $deleteQuery = "
+            DELETE FROM motsCle
+            WHERE idExposition = ?
+              AND motCle NOT IN ($placeholders)
+        ";
+        $deleteStmt = $pdo->prepare($deleteQuery);
+        $deleteStmt->execute(array_merge([$idExposition], $motsCleArray));
+
+        // Ajoute les nouveaux mots-clés absents
+        foreach ($motsCleArray as $motCle) {
+            $insertQuery = "
+                INSERT INTO motsCle (motCle, idExposition)
+                SELECT ?, ?
+                WHERE NOT EXISTS (
+                    SELECT 1 FROM motsCle WHERE motCle = ? AND idExposition = ?
+                )
+            ";
+            $insertStmt = $pdo->prepare($insertQuery);
+            $insertStmt->execute([$motCle, $idExposition, $motCle, $idExposition]);
+        }
+
+        $pdo->commit();
+        return true;
+
+    } catch (PDOException $e) {
+        // En cas d'erreur, annule la transaction
+        $pdo->rollBack();
+        exit($e->getMessage(). $e->getLine(). $e->getFile(). $e->printStackTrace());
+        return false;
+    }
+}
+
+
+
+function verifierChaine($chaine) {
         if (strlen($chaine) < 8) {
             return false;
         }
