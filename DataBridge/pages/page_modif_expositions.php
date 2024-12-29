@@ -2,14 +2,23 @@
 session_start();
 include ("../fonction/fonctionsModification.php");
 include ("../fonction/fonctionsAuthentification.php");
+include ("../fonction/fonctionsFiltres.php");
 
-$nom = isset($_POST['nom']) ? $_POST['nom'] : (isset($_POST['nom_employe']) ? $_POST['nom_employe'] : '');
-$prenom = isset($_POST['prenom']) ? $_POST['prenom'] : (isset($_POST['prenom_employe']) ? $_POST['prenom_employe'] : '');
-$telephone = isset($_POST['telephone']) ? $_POST['telephone'] : (isset($_POST['telephone_employe']) ? $_POST['telephone_employe'] : '');
-$idEmploye = isset($_POST['id_employe']) ? $_POST['id_employe'] : '';
-$login = isset($_POST['login']) ? $_POST['login'] : (isset($_POST['login_employe']) ? $_POST['login_employe'] : '');
+$idExposition = "";
 $pdo = connecterBd();
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (isset($_POST['id_expo']) && !empty($_POST['id_expo'])) {
+        $idExposition = $_POST['id_expo'];
+        // echo "Identifiant de l'exposition reçu : " . htmlspecialchars($id_exposition);
+    } else {
+        // echo "Identifiant non transmis ou vide.";
+    }
+} else {
+    echo "Méthode de requête incorrecte.";
+}
 
+// $idExposition = "E0000002";
+$tableauModifExpositions = rechercheExpositionParId($pdo,$idExposition);
 if (isset($_SESSION["modificationOk"])) {
     if ($_SESSION["modificationOk"]) {
         echo "<script src='../javaScript/scriptModificationEmpOk.js'></script>";
@@ -19,32 +28,31 @@ if (isset($_SESSION["modificationOk"])) {
     unset($_SESSION["modificationOk"]);
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actionModification']) && $_POST['actionModification'] === 'modificationEmploye') {
-    $nom = $_POST['nom'] ?? '';
-    $prenom = $_POST['prenom'] ?? '';
-    $telephone = $_POST['telephone'] ?? '';
-    $idEmploye = $_POST['id_employe'] ?? '';
-    $login = $_POST['login'] ?? '';
-    $pwd = null;
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actionModification']) && $_POST['actionModification'] === 'modificationExposition') {
 
-    // Vérifiez si le mot de passe doit être modifié
-    if (isset($_POST['modifierMotDePasse']) && $_POST['modifierMotDePasse'] === 'on') {
-        $pwd = $_POST['motDePasse'] ?? '';
-        if (empty($pwd)) {
-            echo "<div class='alert alert-danger'>Le mot de passe est requis lorsque vous cochez 'Modifier le mot de passe'.</div>";
-            exit; // Arrêt de l'exécution pour éviter une mise à jour incomplète.
+        $idExposition = $_POST['idExposition'];
+        $intitule = $_POST['intitule'];
+        $periodeDebut = $_POST['periodeDebut'];
+        $periodeFin = $_POST['periodeFin'];
+        $nombreOeuvres = $_POST['nombreOeuvres'];
+        $resume = $_POST['resume'];
+        $debutExpoTemp = $_POST['debutExpoTemp'];
+        $finExpoTemp = $_POST['finExpoTemp'];
+        $motsCles = $_POST['motsCles'];
+        // Convertion en int
+        $periodeDebut = intval($periodeDebut);
+        $periodeFin = intval($periodeFin);
+        $nombreOeuvres = intval($nombreOeuvres);
+        try {
+            $updateExpoOk = modifierExposition($pdo, $idExposition, $intitule, $periodeDebut,
+                $periodeFin, $nombreOeuvres, $resume, $debutExpoTemp, $finExpoTemp,$motsCles);
+            $_SESSION["modificationOk"] = $updateExpoOk;
+            header('Location: page_modif_expositions.php');
+            exit;
+
+        } catch (PDOException $e) {
+            echo "Erreur lors de la modification de l'exposition : " . $e->getMessage();
         }
-        $pwd = md5($pwd); 
-    }
-
-    if (!empty($nom) && !empty($prenom) && !empty($telephone) && !empty($idEmploye)) {
-        $updateEmpOk = modifierEmploye($pdo, $idEmploye, $nom, $prenom, $telephone, $login, $pwd);
-        $_SESSION["modificationOk"] = $updateEmpOk;
-        header('Location: page_modif_employes.php');
-        exit;
-    } else {
-        echo "<div class='alert alert-danger'>Tous les champs sont requis. Veuillez les remplir correctement.</div>";
-    }
 }
 ?>
 <!DOCTYPE html>
@@ -151,49 +159,76 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actionModification'])
             <div class="card shadow p-4 rounded-3">
                 <h2 class="text-center mb-4">Modifier les informations</h2>
 
-                <form action="page_modif_employes.php" method="post">
-                    <input type="hidden" name="actionModification" value="modificationEmploye">
-                    <input type="hidden" name="id_employe" value="<?php echo htmlentities($idEmploye, ENT_QUOTES); ?>">
+                <form action="page_modif_expositions.php" method="post">
+                    <input type="hidden" name="actionModification" value="modificationExposition">
+                    <input type="hidden" name="idExposition" value="<?php echo $tableauModifExpositions['idExposition']; ?>">
 
-                    <!-- Champ Nom -->
+                    <!-- Champ intitule
+                    Nombre Oeuvres
+                    Resume
+                    Debut Exposition
+                    Fin Exposition
+                    Mot Cle de l'Exposition: -->
+                    <!--Champ intitulé-->
                     <div class="mb-3">
-                        <label for="nom" class="form-label fw-bold">Nom</label>
-                        <input type="text" class="form-control" id="nom" name="nom" placeholder="Entrez le nom"
-                               value="<?php echo htmlentities($_POST['nom'] ?? $nom, ENT_QUOTES); ?>" required>
+                        <label for="nom" class="form-label fw-bold">Intitulé</label>
+                        <input type="text" class="form-control" id="intitule" name="intitule" placeholder="Entrez l'intitulé"
+                               value="<?php echo htmlentities($tableauModifExpositions['intitule'], ENT_QUOTES); ?>" required>
                     </div>
 
-                    <!-- Champ Prénom -->
+                    <!-- Champ Période de Début -->
                     <div class="mb-3">
-                        <label for="prenom" class="form-label fw-bold">Prénom</label>
-                        <input type="text" class="form-control" id="prenom" name="prenom" placeholder="Entrez le prénom"
-                               value="<?php echo htmlentities($_POST['prenom'] ?? $prenom, ENT_QUOTES); ?>" required>
+                        <label for="periodeDebut" class="form-label fw-bold">Période de Début</label>
+                        <input type="text" class="form-control" id="periodeDebut" name="periodeDebut" placeholder="Entrez la Période de Début"
+                               value="<?php echo htmlentities($tableauModifExpositions['periodeDebut'], ENT_QUOTES); ?>" required>
                     </div>
 
-                    <!-- Champ Téléphone -->
+                    <!-- Champ Période de Fin -->
                     <div class="mb-3">
-                        <label for="telephone" class="form-label fw-bold">Téléphone</label>
-                        <input type="tel" class="form-control" id="telephone" name="telephone" placeholder="5432" pattern="^[0-9]{4}$"
-                               value="<?php echo htmlentities($_POST['telephone'] ?? $telephone, ENT_QUOTES); ?>" required>
-                        <small class="form-text text-muted">Format: 4 chiffres</small>
+                        <label for="periodeFin" class="form-label fw-bold">Période de Fin</label>
+                        <input type="text" class="form-control" id="periodeFin" name="periodeFin" placeholder="Entrez la Période de Fin"
+                               value="<?php echo htmlentities($tableauModifExpositions['periodeFin'], ENT_QUOTES); ?>" required>
                     </div>
 
-                    <!-- Champ Login -->
+                    <!-- Champ Nombre Oeuvres -->
                     <div class="mb-3">
-                        <label for="login" class="form-label fw-bold">Login</label>
-                        <input type="text" class="form-control" id="login" name="login" placeholder="Entrez le login"
-                               value="<?php echo htmlentities($_POST['login'] ?? $login, ENT_QUOTES); ?>" required>
+                        <label for="nombreOeuvres" class="form-label fw-bold">Nombre d'Oeuvres</label>
+                        <input type="text" class="form-control" id="nombreOeuvres" name="nombreOeuvres" placeholder="Entrez le Nombre d'Oeuvres"
+                               value="<?php echo htmlentities($tableauModifExpositions['nombreOeuvres'], ENT_QUOTES); ?>" required>
                     </div>
 
-                    <!-- Checkbox pour modifier le mot de passe -->
-                    <div class="mb-3 form-check">
-                        <input type="checkbox" class="form-check-input" id="modifierMotDePasse" name="modifierMotDePasse">
-                        <label class="form-check-label" for="modifierMotDePasse">Modifier le mot de passe</label>
+                    <!-- Champ Résumé -->
+                    <div class="mb-3">
+                        <label for="resume" class="form-label fw-bold">Résumé</label>
+                        <input type="text" class="form-control" id="resume" name="resume" placeholder="Entrez le Résumé"
+                               value="<?php echo htmlentities($tableauModifExpositions['resume'], ENT_QUOTES); ?>" required>
                     </div>
 
-                    <!-- Champ Mot de passe -->
-                    <div class="mb-3" id="motDePasseContainer" style="display: none;">
-                        <label for="motDePasse" class="form-label fw-bold">Mot de passe</label>
-                        <input type="password" class="form-control" id="motDePasse" name="motDePasse" placeholder="Entrez le mot de passe">
+                    <!-- Champ debut exposition -->
+                    <div class="mb-3">
+                        <label for="debutExpoTemp" class="form-label fw-bold">Debut Exposition</label>
+                        <?php if ($tableauModifExpositions['debutExpoTemp'] == null) {
+                            $tableauModifExpositions['debutExpoTemp'] = "";
+                        }?>
+                        <input type="text" class="form-control" id="debutExpoTemp" name="debutExpoTemp" placeholder="Entrez le Début de l'Exposition (non obligatoire si exposition permanente)"
+                               value="<?php echo htmlentities($tableauModifExpositions['debutExpoTemp'], ENT_QUOTES); ?>">
+                    </div>
+
+                    <!-- Champ fin exposition -->
+                    <div class="mb-3">
+                        <label for="finExpoTemp" class="form-label fw-bold">Fin Exposition</label>
+                        <?php if ($tableauModifExpositions['finExpoTemp'] == null) {
+                            $tableauModifExpositions['finExpoTemp'] = "";
+                        }?>
+                        <input type="text" class="form-control" id="finExpoTemp" name="finExpoTemp" placeholder="Entrez la Fin de l'Exposition (non obligatoire si exposition permanente)"
+                               value="<?php echo htmlentities($tableauModifExpositions['finExpoTemp'], ENT_QUOTES); ?>">
+                    </div>
+
+                    <!-- Champ mot(s) clé(s) -->
+                    <div class="mb-3">
+                        <label for="motsCles" class="form-label fw-bold">Mot(s) Clé(s)</label>
+                        <input type="text" class="form-control" id="motsCles" name="motsCles" placeholder="Entrez le(s) mot(s) clé(s)"
+                               value="<?php echo htmlentities($tableauModifExpositions['motsCles'], ENT_QUOTES); ?>">
                     </div>
 
                     <!-- Boutons -->
@@ -201,7 +236,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actionModification'])
                         <button type="submit" class="btn btn-primary fw-bold px-4">
                             <i class="fas fa-save"></i>&nbsp;&nbsp;Enregistrer
                         </button>
-                        <a href="page_employes.php?page=1" class="btn btn-danger fw-bold px-4">
+                        <a href="page_expositions.php?page=1" class="btn btn-danger fw-bold px-4">
                             <i class="fas fa-times text-white "></i>&nbsp;&nbsp;Annuler
                         </a>
                     </div>
@@ -224,10 +259,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actionModification'])
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                La modification de l'employé a été effectuée avec succès.
+                La modification de l'exposition a été effectuée avec succès.
             </div>
             <div class="modal-footer">
-                <form method="post" action="page_employes.php?page=1">
+                <form method="post" action="page_expositions.php?page=1">
                     <button type="button" class="btn btn-success" id="closeModalButton" data-bs-dismiss="modal">Fermer</button>
                 </form>
             </div>
@@ -244,10 +279,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actionModification'])
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
             </div>
             <div class="modal-body">
-                La modification de l'employé a échoué.<br>Veuillez réessayer.
+                La modification de l'exposition a échoué.<br>Veuillez réessayer.
             </div>
             <div class="modal-footer">
-                <form method="post" action="page_employes.php?page=1">
+                <form method="post" action="page_expositions.php?page=1">
                     <button type="submit" class="btn btn-danger" id="closeModalButton" data-bs-dismiss="modal">Fermer</button>
                 </form>
             </div>
@@ -260,7 +295,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actionModification'])
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
 <!-- Fichier JS externe -->
 <script src="../javaScript/scriptBurger.js"></script>
-<script src="../javaScript/scriptRedirectionPE.js"></script>
+<script src="../javaScript/scriptRedirectionPEx.js"></script>
 <script src="../javaScript/scriptAffichageMdp.js"></script>
 <script src="../javaScript/scriptChampMdp.js"></script>
 

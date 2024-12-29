@@ -2,7 +2,6 @@
 include("../fonction/fonctionsAuthentification.php");
 include("../fonction/fonctionInsert.php");
 session_start();
-
 if (isset($_SESSION["insertionOk"]) && $_SESSION["insertionOk"] === true) {
     echo "<script src='../javaScript/scriptInsertionEmpOk.js'></script>";
     unset($_SESSION["insertionOk"]);
@@ -12,7 +11,6 @@ if (isset($_SESSION["insertionOk"]) && $_SESSION["insertionOk"] === false)
     echo "<script src='../javaScript/scriptInsertionEmpKo.js'></script>";
     unset($_SESSION["insertionOk"]);
 }
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         $pdo = connecterBd();
@@ -21,12 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: erreurConnexion.php');
     }
 
-//    $nom = $_POST['nom'] ?? null;
-//    $prenom = $_POST['prenom'] ?? null;
-//    $telephone = $_POST['telephone'] ?? null;
-//    $login = $_POST['login'] ?? null;
-//    $pwd = $_POST['motDePasse'] ?? null;
-//    $pwd = md5($pwd);
     $intituleExpo = $_POST['intitule'] ?? null;
     $periodeDebut = $_POST['periodeDebut'] ?? null;
     $periodeFin = $_POST['periodeFin'] ?? null;
@@ -42,7 +34,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $resume = htmlentities($resume);
     $debutExpoTemp = htmlentities($debutExpoTemp);
     $finExpoTemp = htmlentities($finExpoTemp);
-    // peut etre probleme avec les , -----------------------------------------------------------------------------------
     $motsCles = htmlentities($motsCles);
 
     // Convertion en int
@@ -181,10 +172,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="card shadow p-4 rounded-3">
                 <h2 class="text-center mb-4">Ajouter les informations</h2>
 
-                <form action="page_ajout_expositions.php" method="post">
+                <form method="post" action="page_ajout_expositions.php" id="expositionForm">
                     <!--Champ intitulé-->
                     <div class="mb-3">
-                        <label for="nom" class="form-label fw-bold">Intitulé</label>
+                        <label for="intitule" class="form-label fw-bold">Intitulé</label>
                         <input type="text" class="form-control" id="intitule" name="intitule" placeholder="Entrez l'intitulé" required>
                     </div>
 
@@ -313,6 +304,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <script src="../javaScript/scriptBurger.js"></script>
 <script src="../javaScript/scriptRedirectionPEx.js"></script>
 <script src="../javaScript/scriptValidationMotsCles.js"></script>
+<script src="../javaScript/scriptPreRemplissageForumlaire.js"></script>
+
 
 </html>
 
