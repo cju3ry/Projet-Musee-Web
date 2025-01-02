@@ -1,0 +1,23 @@
+body, html {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-image: url('../images/imageIndex.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+h1 {
+    text-align: center;
+    color: white; /* Couleur du texte */
+}
+
+/* Effet de transparence et de flou pour la navbar */
+.navbar-transparent {
+    background-color: rgba(0, 0, 0, 0.2); /* Noir avec 20% d'opacité */
+    backdrop-filter: blur(5px); /* Conserve l'effet de flou */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Optionnel : Bordure subtile */
+}

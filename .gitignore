@@ -1,21 +1,17 @@
 # Default ignored files
 /shelf/
 /workspace.xml
+
 # Editor-based HTTP Client requests
 /httpRequests/
+
 # Datasource local storage ignored files
 /dataSources/
-/dataSources.local.xml
 
 #PhpStorm
-
-# Additional directories to ignore
 /.idea
 /DataBridge/.idea
-/DataBridge/domains
 /DataBridge/logsSQL
 /DataBridge/sauvegarde
-
-# Additional files to ignore
 DataBridge/dump_database.sh
 DataBridge/.my.cnf
