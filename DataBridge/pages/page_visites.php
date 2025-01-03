@@ -157,15 +157,12 @@ try {
 <!-- Main Content -->
 <div class="container text-center mt-5">
     <h1 class="mb-5 fs-1 text-white fw-bold"><br><br><br>Bienvenue dans la section Gestion des Visites</h1>
-
-
-
-    <!--
-    <a href="ajouter_employe.html" class="btn btn-primary btn-lg position-fixed btn-flottant" target="_blank">
-        <i class="fas fa-user-plus"></i>Ajouter un employé
-    </a>
-    -->
-
+    <!-- Bouton pour ajouter une visite -->
+    <div class="position-fixed bottom-0 start-0 m-3">
+        <form method="post" action="export_visites_csv.php">
+            <button type="submit" class="btn btn-success">Exporter les Visites</button>
+        </form>
+    </div>
     <form method="post" action="page_ajout_employes.php" target="_blank">
         <button class="position-absolute top-0 end-0 m-2 text-primary border-0 bg-transparent">
             <a class="btn btn-primary btn-lg position-fixed btn-flottant">
