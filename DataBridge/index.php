@@ -7,7 +7,6 @@ $tableauLoginEmploye = [];
 $tableauLoginAdmin = [];
 $erreurConnexion = false;
 
-
 if(isset($_POST['Identifiant'])) {
     $login = htmlspecialchars($_POST['Identifiant']);
 }

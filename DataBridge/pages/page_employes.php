@@ -150,19 +150,17 @@ try {
 <!-- Main Content -->
 <div class="container text-center mt-5">
     <h1 class="mb-5 fs-1 text-white fw-bold"><br><br><br>Bienvenue dans la section Gestion des Comptes Employés</h1>
-
-    <!--
-    <a href="ajouter_employe.html" class="btn btn-primary btn-lg position-fixed btn-flottant" target="_blank">
-        <i class="fas fa-user-plus"></i>Ajouter un employé
-    </a>
-    -->
-
+    <!-- Bouton pour ajouter un employé -->
     <form method="post" action="page_ajout_employes.php" target="_blank">
         <button class="position-absolute top-0 end-0 m-2 text-primary border-0 bg-transparent">
             <a class="btn btn-primary btn-lg position-fixed btn-flottant">
                 <i class="fas fa-user-plus"></i>Ajouter un employé
             </a>
         </button>
+    </form>
+    <!-- Bouton pour exporter les employés en CSV -->
+    <form method="post" action="export_employes_csv.php" style="position: fixed; bottom: 10px; left: 10px;">
+        <button type="submit" class="btn btn-success btn-lg margeBtnSeConnecter">Exporter en CSV</button>
     </form>
     <div class="row row-cols-1 row-cols-md-8 g-4 justify-content-center rounded-3 mb-5 pt-2  navbar-transparent">
         <form method="post" action="page_employes.php?page=1" class="row justify-content-center">
