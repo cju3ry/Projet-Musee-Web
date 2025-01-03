@@ -14,10 +14,10 @@ try {
             conferencier.idConferencier,
             conferencier.nomConferencier,
             conferencier.prenomConferencier,
-            CONCAT('#', GROUP_CONCAT(specialites.intitule SEPARATOR ', '), '#') AS specialites,
+            CONCAT('#', GROUP_CONCAT(DISTINCT specialites.intitule SEPARATOR ', '), '#') AS specialites,
             conferencier.telephone,
             conferencier.estEmploye,
-            CONCAT(REPLACE(indisponibilites.dateDebutIndispo, '-', '/'), ';', REPLACE(indisponibilites.dateFinIndispo, '-', '/')) AS indisponibilites
+            GROUP_CONCAT(DISTINCT CONCAT(REPLACE(indisponibilites.dateDebutIndispo, '-', '/'), ';', REPLACE(indisponibilites.dateFinIndispo, '-', '/')) SEPARATOR ', ') AS indisponibilites
         FROM conferencier
         LEFT JOIN specialites ON conferencier.idConferencier = specialites.idConferencier
         LEFT JOIN indisponibilites ON conferencier.idConferencier = indisponibilites.idConferencier
