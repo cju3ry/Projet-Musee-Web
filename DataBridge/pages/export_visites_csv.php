@@ -9,7 +9,17 @@ if (!isset($_SESSION['loginAdmin'])) {
 
 try {
 	$pdo = connecterBd();
-	$stmt = $pdo->query("SELECT * FROM visite");
+	$stmt = $pdo->query("
+		SELECT
+		    visite.idVisite,
+		    visite.idExposition,
+		    visite.idConferencier,
+		    visite.idEmploye,
+		    DATE_FORMAT(visite.dateVisite, '%d/%m/%Y') AS dateVisite,
+		    DATE_FORMAT(visite.heureDebutVisite, '%Hh%i') AS heureDebutVisite,
+		    visite.intituleVisite,
+		    visite.numTelVisite
+		FROM visite");
 	$visites = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	header('Content-Type: text/csv');

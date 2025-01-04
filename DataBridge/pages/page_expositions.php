@@ -3,17 +3,25 @@ session_start();
 include("../fonction/fonctionsFiltres.php");
 include("../fonction/fonctionsAuthentification.php");
 include ("../fonction/fonctionsSupression.php");
+include("../fonction/fonctionInsert.php");
+
 $tableauEmployes = "";
 try {
     $pdo = connecterBd();
+	$tabPeriodeDebut = tabPeriodeDebut($pdo);
+	$tabPeriodeFin = tabPeriodeFin($pdo);
+	$tabNombreOeuvres = tabNombreOeuvres($pdo);
+	$tabMotsCles = tabMotsCles($pdo);
+	$tabDebutExposition = tabDebutExposition($pdo);
+	$tabFinExposition = tabFintExposition($pdo);
     $intitule = "";
-    $periodeDebut = "";
-    $periodeFin = "";
-    $nombreOeuvres = "";
-    $resume = "";
-    $debutExpoTemp = "";
-    $finExpoTemp= "";
-    $motCle     = "";
+	$periodeDebut = $_POST['periodeDebut'] ?? "";
+	$periodeFin = $_POST['periodeFin'] ?? ""; // ca marche pas pour le moment
+	$nombreOeuvres = $_POST['nombreOeuvres'] ?? "";
+	$resume = "";                             // ca marche pas pour le moment
+	$debutExpoTemp = $_POST['debutExposition'] ?? "";
+	$finExpoTemp = $_POST['finExposition'] ?? "";    // ca marche bizzarement
+	$motCle = $_POST['motsCles'] ?? "";
     $tableauExpositions = rechercheExposition($pdo, $intitule,$periodeDebut,$periodeFin,$nombreOeuvres,$resume
                        ,$debutExpoTemp,$finExpoTemp,$motCle);
     $suppressionOk = false;
@@ -26,8 +34,8 @@ try {
     $nbr_total_pages = ceil(count($tableauExpositions)/$nbr_elements_par_page);
     $debut=($page-1)*$nbr_elements_par_page;
 
-    $tableauExpositions = rechercheExposition($pdo, $intitule,$periodeDebut,$periodeFin,$nombreOeuvres,$resume
-        ,$debutExpoTemp,$finExpoTemp,$motCle);
+	$tableauExpositions = rechercheExpositionPage($pdo, $intitule, $periodeDebut, $periodeFin, $nombreOeuvres, $resume
+		, $debutExpoTemp, $finExpoTemp, $motCle, $debut, $nbr_elements_par_page);
 
     $middle_page = max(2, min($current_page, $nbr_total_pages - 1));
 
@@ -160,12 +168,12 @@ try {
 <div class="container text-center mt-5">
     <h1 class="mb-5 fs-1 text-white fw-bold"><br><br><br>Bienvenue dans la section Gestion des Expostions</h1>
     <!-- Add this at the bottom of the page, before the closing </body> tag -->
-    <div class="position-fixed bottom-0 start-0 m-3">
-        <form method="post" action="export_expositions_csv.php">
-            <button type="submit" class="btn btn-success">Exporter les Expositions</button>
-        </form>
-    </div>
-    <form method="post" action="page_ajout_employes.php" target="_blank">
+    <!-- Bouton pour exporter les employés en CSV -->
+    <form method="post" action="export_expositions_csv.php"
+          style="position: fixed; bottom: 10px; left: 10px; z-index: 9999;">
+        <button type="submit" class="btn btn-success btn-lg margeBtnSeConnecter">Exporter les empositions</button>
+    </form>
+    <form method="post" action="page_ajout_expositions.php" target="_blank">
         <button class="position-absolute top-0 end-0 m-2 text-primary border-0 bg-transparent">
             <a class="btn btn-primary btn-lg position-fixed btn-flottant">
                 <i class="fas fa-user-plus"></i>Ajouter une exposition
@@ -182,35 +190,71 @@ try {
             </div>
             <div class="row " id="details">
                 <div class="col-md-3">
-                    <label for="nom" class="form-label text-white ">Nom</label>
-                    <select id="nom" name="nom" class="form-select">
+                    <label for="periodeDebut" class="form-label text-white ">Periode Debut de l'Exposition</label>
+                    <select id="periodeDebut" name="periodeDebut" class="form-select">
                         <option value="">Tous</option>
-                        <?php foreach ($tableauNomEmployes as $nomEmploye): ?>
-                            <option value="<?php echo htmlentities($nomEmploye, ENT_QUOTES); ?>" <?php echo ($nomEmp == $nomEmploye) ? 'selected' : ''; ?>>
-                                <?php echo htmlentities($nomEmploye, ENT_QUOTES); ?>
+		                <?php foreach ($tabPeriodeDebut as $periodeDebutExp): ?>
+                            <option value="<?php echo htmlentities($periodeDebutExp, ENT_QUOTES); ?>" <?php echo ($periodeDebut == $periodeDebutExp) ? 'selected' : ''; ?>>
+				                <?php echo htmlentities($periodeDebutExp, ENT_QUOTES); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="col-md-3 mb-5">
-                    <label for="prenom" class="form-label text-white">Prénom</label>
-                    <select id="prenom" name="prenom" class="form-select">
+                    <label for="periodeFin" class="form-label text-white">Période Fin Exposition</label>
+                    <select id="periodeFin" name="periodeFin" class="form-select">
                         <option value="">Tous</option>
-                        <?php foreach ($tableauPrenomEmployes as $prenomEmploye): ?>
-                            <option value="<?php echo htmlentities($prenomEmploye, ENT_QUOTES); ?>" <?php echo ($prenomEmp == $prenomEmploye) ? 'selected' : ''; ?>>
-                                <?php echo htmlentities($prenomEmploye, ENT_QUOTES); ?>
+		                <?php foreach ($tabPeriodeFin as $periodeFinExp): ?>
+                            <option value="<?php echo htmlentities($periodeFinExp, ENT_QUOTES); ?>" <?php echo ($periodeFin == $periodeFinExp) ? 'selected' : ''; ?>>
+				                <?php echo htmlentities($periodeFinExp, ENT_QUOTES); ?>
                             </option>
-                        <?php endforeach; ?>
+		                <?php endforeach; ?>
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="telephone" class="form-label text-white">Téléphone</label>
-                    <select id="telephone" name="telephone" class="form-select">
+                    <label for="nombreOeuvres" class="form-label text-white">Nombre Oeuvres</label>
+                    <select id="nombreOeuvres" name="nombreOeuvres" class="form-select">
                         <option value="">Tous</option>
-                        <?php foreach ($tableauNumTelEmployes as $numTelEmploye): ?>
-                            <option value="<?php echo htmlentities($numTelEmploye, ENT_QUOTES); ?>"
-                                <?php echo ($numTelEmp == $numTelEmploye) ? 'selected' : ''; ?>>
-                                <?php echo htmlentities($numTelEmploye, ENT_QUOTES); ?>
+		                <?php foreach ($tabNombreOeuvres as $nombreOeuvresExp): ?>
+                            <option value="<?php echo htmlentities($nombreOeuvresExp, ENT_QUOTES); ?>"
+				                <?php echo ($nombreOeuvres == $nombreOeuvresExp) ? 'selected' : ''; ?>>
+				                <?php echo htmlentities($nombreOeuvresExp, ENT_QUOTES); ?>
+                            </option>
+		                <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="motsCles" class="form-label text-white">Mots Clés </label>
+                    <select id="motsCles" name="motsCles" class="form-select">
+                        <option value="">Tous</option>
+			            <?php foreach ($tabMotsCles as $motsClesExp): ?>
+                            <option value="<?php echo htmlentities($motsClesExp, ENT_QUOTES); ?>"
+					            <?php echo ($motCle == $motsClesExp) ? 'selected' : ''; ?>>
+					            <?php echo htmlentities($motsClesExp, ENT_QUOTES); ?>
+                            </option>
+			            <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="debutExposition" class="form-label text-white">Début Exposition</label>
+                    <select id="debutExposition" name="debutExposition" class="form-select">
+                        <option value="">Tous</option>
+			            <?php foreach ($tabDebutExposition as $debutExpositionExp): ?>
+                            <option value="<?php echo htmlentities($debutExpositionExp, ENT_QUOTES); ?>"
+					            <?php echo ($debutExpoTemp == $debutExpositionExp) ? 'selected' : ''; ?>>
+					            <?php echo htmlentities($debutExpositionExp, ENT_QUOTES); ?>
+                            </option>
+			            <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="finExposition" class="form-label text-white">Fin Exposition</label>
+                    <select id="finExposition" name="finExposition" class="form-select">
+                        <option value="">Tous</option>
+			            <?php foreach ($tabFinExposition as $finExpositionExp): ?>
+                            <option value="<?php echo htmlentities($finExpositionExp, ENT_QUOTES); ?>"
+					            <?php echo ($finExpoTemp == $finExpositionExp) ? 'selected' : ''; ?>>
+					            <?php echo htmlentities($finExpositionExp, ENT_QUOTES); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -306,62 +350,66 @@ try {
             <thead>
             <tr>
                 <th class="text-center">Identifiant</th>
-                <th class="text-center">Nom</th>
-                <th class="text-center">Prénom</th>
-                <th class="text-center">Numéro de Téléphone</th>
-                <th class="text-center">Login</th>
+                <th class="text-center">Intitulé</th>
+                <th class="text-center">Période de Début</th>
+                <th class="text-center">Période de Fin</th>
+                <th class="text-center">Nombre d'Oeuvres</th>
+                <th class="text-center">Resume</th>
+                <th class="text-center">Debut Exposition</th>
+                <th class="text-center">Fin Exposition</th>
+                <th class="text-center">Mots Clés</th>
 
                 <th class="text-center">Modifier</th>
                 <th class="text-center">Supprimer</th>
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($tableauEmployes as $employe): ?>
+            <?php foreach ($tableauExpositions as $expostions): ?>
                 <tr>
-                    <td><?php echo($employe['idEmploye']) ?></td>
-                    <td><?php echo($employe['nom']) ?></td>
-                    <td><?php echo($employe['prenom']) ?></td>
-                    <td><?php echo($employe['numTel']) ?></td>
-                    <td><?php echo($employe['login']) ?></td>
+                    <td><?php echo($expostions['idExposition']) ?></td>
+                    <td><?php echo($expostions['intitule']) ?></td>
+                    <td><?php echo($expostions['periodeDebut']) ?></td>
+                    <td><?php echo($expostions['periodeFin']) ?></td>
+                    <td><?php echo($expostions['nombreOeuvres']) ?></td>
+                    <td><?php echo($expostions['resume']) ?></td>
+                    <td><?php echo($expostions['debutExpoTemp']) ?></td>
+                    <td><?php echo($expostions['finExpoTemp']) ?></td>
+                    <td><?php echo($expostions['motsCles']) ?></td>
                     <td class="text-center">
-                        <form method="post" action="page_modif_employes.php">
+                        <form method="post" action="page_modif_expositions.php">
                             <button class="btn btn-link text-primary p-0">
                                 <i class="fas fa-pencil-alt fs-4"></i>
                             </button>
                             <?php
-                            $nom = $employe['nom'];
-                            $prenom = $employe['prenom'];
-                            $telephone = $employe['numTel'];
-                            $idEmp = $employe['idEmploye'];
-                            $loginEmp = $employe['login'];
-                            echo '<input type="hidden" name="nom_employe" value="' . htmlentities($nom, ENT_QUOTES) . '">';
-                            echo '<input type="hidden" name="prenom_employe" value="' . htmlentities($prenom, ENT_QUOTES) . '">';
-                            echo '<input type="hidden" name="telephone_employe" value="' . htmlentities($telephone, ENT_QUOTES) . '">';
-                            echo '<input type="hidden" name="id_employe" value="' . htmlentities($idEmp, ENT_QUOTES) . '">';
-                            echo '<input type="hidden" name="login_employe" value="' . htmlentities($loginEmp, ENT_QUOTES) . '">';
+                            $idExpo = $expostions['idExposition'];
+                            echo "<input type='hidden' name='id_expo' value='" . htmlspecialchars($idExpo) . "'>";
                             ?>
                         </form>
                     </td>
                     <td class="text-center">
-                        <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModalTableau<?php echo $idEmp; ?>">
+                        <a href="#" class="text-danger" data-bs-toggle="modal"
+                           data-bs-target="#deleteModalTableau<?php echo $idExpo; ?>">
                             <i class="fas fa-trash-alt fs-4"></i>
                         </a>
                         <!-- Delete Confirmation Modal -->
-                        <div class="modal fade" id="deleteModalTableau<?php echo $idEmp; ?>" tabindex="-1" aria-labelledby="deleteModalLabel<?php echo $idEmp; ?>" aria-hidden="true">
+                        <div class="modal fade" id="deleteModalTableau<?php echo $idExpo; ?>" tabindex="-1"
+                             aria-labelledby="deleteModalLabel<?php echo $idExpo; ?>" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel<?php echo $idEmp; ?>">Confirmation de suppression</h5>
+                                        <h5 class="modal-title" id="deleteModalLabel<?php echo $idExpo; ?>">Confirmation
+                                            de suppression</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                                     </div>
                                     <div class="modal-body">
-                                        Êtes-vous sûr de vouloir supprimer cet employé ?
+                                        Êtes-vous sûr de vouloir supprimer cette exposition ?
                                     </div>
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                                         <form method="post" action="page_expositions.php?page=1">
                                             <input type="hidden" name="actionSuppression" value="supprimerExposition">
-                                            <input type="hidden" name="id_employe" value="<?php echo htmlentities($employe['idEmploye'], ENT_QUOTES); ?>">
+                                            <input type="hidden" name="id_expo"
+                                                   value="<?php echo htmlentities($idExpo, ENT_QUOTES); ?>">
                                             <button type="submit" class="btn btn-danger">Confirmer</button>
                                         </form>
                                     </div>

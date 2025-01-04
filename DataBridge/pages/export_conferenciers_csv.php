@@ -25,6 +25,10 @@ try {
     ");
 	$conferenciers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
+	if (empty($conferenciers)) {
+		throw new Exception("No data found");
+	}
+
 	header('Content-Type: text/csv');
 	header('Content-Disposition: attachment;filename=conferenciers.csv');
 
@@ -55,9 +59,9 @@ try {
 
 	fclose($output);
 	exit();
-} catch (PDOException $e) {
-	error_log("Database error: " . $e->getMessage()); // Log the error message
-	echo "Database error: " . $e->getMessage(); // Display the error message
+} catch (Exception $e) {
+	error_log("Error: " . $e->getMessage()); // Log the error message
+	echo "Error: " . $e->getMessage(); // Display the error message
 	exit();
 }
 ?>

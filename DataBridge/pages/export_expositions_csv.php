@@ -9,7 +9,21 @@ if (!isset($_SESSION['loginAdmin'])) {
 
 try {
 	$pdo = connecterBd();
-	$stmt = $pdo->query("SELECT * FROM exposition");
+	$stmt = $pdo->query("
+        SELECT
+            exposition.idExposition AS Ident,
+            exposition.intitule AS Intitulé,
+            exposition.periodeDebut AS PériodeDeb,
+            exposition.periodeFin AS PériodeFin,
+            exposition.nombreOeuvres AS nombre,
+            CONCAT('#', GROUP_CONCAT(DISTINCT motscle.motCle SEPARATOR ', '), '#') AS motclé,
+            exposition.resume AS résumé,
+            DATE_FORMAT(exposition.debutExpoTemp, '%d/%m/%Y') AS Début,
+			DATE_FORMAT(exposition.finExpoTemp, '%d/%m/%Y') AS Fin
+        FROM exposition
+        LEFT JOIN motscle ON exposition.idExposition = motscle.idExposition
+        GROUP BY exposition.idExposition, exposition.intitule, exposition.periodeDebut, exposition.periodeFin, exposition.nombreOeuvres, exposition.resume, exposition.debutExpoTemp, exposition.finExpoTemp
+    ");
 	$expositions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	header('Content-Type: text/csv');

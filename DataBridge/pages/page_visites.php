@@ -5,17 +5,27 @@ include("../fonction/fonctionsAuthentification.php");
 include ("../fonction/fonctionsSupression.php");
 try {
     $pdo = connecterBd();
-    $nomEmp = "";
-    $prenomEmp = "";
-    $numTelEmp = "";
-    $idEmp = "";
-    $nomEmp = $_POST['nom'] ?? null;
-    $prenomEmp = $_POST['prenom'] ?? null;
-    $numTelEmp = $_POST['telephone'] ?? null;
-    $tableauEmployes = rechercheEmploye($pdo, $nomEmp, $prenomEmp, $numTelEmp);
-    $tableauNomEmployes = tabNomEmploye($pdo);
-    $tableauPrenomEmployes = tabPrenomEmploye($pdo);
-    $tableauNumTelEmployes = tabNumTel($pdo);
+	//$nomEmp = "";
+	//$prenomEmp = "";
+	//$numTelEmp = "";
+	//$idEmp = "";
+	//$nomEmp = $_POST['nom'] ?? null;
+	//$prenomEmp = $_POST['prenom'] ?? null;
+	//$numTelEmp = $_POST['telephone'] ?? null;
+
+	$ident = "";
+	$exposition = "";
+	$conferencier = "";
+	$employe = "";
+	$date = "";
+	$heuredebut = "";
+	$intitule = "";
+	$telephone = "";
+	// $tableauEmployes = rechercheEmploye($pdo, $nomEmp, $prenomEmp, $numTelEmp);
+	$tableauVisites = rechercheVisite($pdo, $ident, $exposition, $conferencier, $employe, $date, $heuredebut, $intitule, $telephone);
+	// $tableauNomEmployes = tabNomEmploye($pdo);
+	// $tableauPrenomEmployes = tabPrenomEmploye($pdo);
+	// $tableauNumTelEmployes = tabNumTel($pdo);
     $suppressionOk = false;
     $admin = false;
 
@@ -23,20 +33,20 @@ try {
 
     @$page=$_GET["page"];
     $nbr_elements_par_page = 6;
-    $nbr_total_pages = ceil(count($tableauEmployes)/$nbr_elements_par_page);
+	$nbr_total_pages = ceil(count($tableauVisites) / $nbr_elements_par_page);
     $debut=($page-1)*$nbr_elements_par_page;
 
-    $tableauEmployes = rechercheEmployePage($pdo, $nomEmp, $prenomEmp, $numTelEmp, $debut, $nbr_elements_par_page);
+	$tableauVisites = rechercheVisitePage($pdo, $ident, $exposition, $conferencier, $employe, $date, $heuredebut, $intitule, $telephone, $debut, $nbr_elements_par_page);
 
     $middle_page = max(2, min($current_page, $nbr_total_pages - 1));
 
-    if (isset($_POST['actionSuppression']) && $_POST['actionSuppression'] === 'supprimerEmploye') {
-        $suppressionOk = suppressionEmploye($pdo, $_POST['id_employe']); // Suppression
+	if (isset($_POST['actionSuppression']) && $_POST['actionSuppression'] === 'supprimerVisite') {
+		$suppressionOk = suppressionVisite($pdo, $_POST['idVisite']);
         $_SESSION["suppressionOk"] = $suppressionOk;
-        $_SESSION["idEmployeSupprimer"] = $_POST['id_employe'];
+		$_SESSION["idVisiteSupprime"] = $_POST['idVisite'];
         $_SESSION["afficherModale"] = true; // Activer l'affichage
         $_SESSION["afficherModaleSuppOk"] = true; // Activer l'affichage
-        header('Location: page_employes.php?page=1');
+		header('Location: page_visites.php?page=1');
         exit();
     }
     
@@ -157,16 +167,16 @@ try {
 <!-- Main Content -->
 <div class="container text-center mt-5">
     <h1 class="mb-5 fs-1 text-white fw-bold"><br><br><br>Bienvenue dans la section Gestion des Visites</h1>
+    <!-- Bouton pour exporter les visites en CSV -->
+    <form method="post" action="export_visites_csv.php"
+          style="position: fixed; bottom: 10px; left: 10px; z-index: 9999;">
+        <button type="submit" class="btn btn-success btn-lg margeBtnSeConnecter">Exporter les visites</button>
+    </form>
     <!-- Bouton pour ajouter une visite -->
-    <div class="position-fixed bottom-0 start-0 m-3">
-        <form method="post" action="export_visites_csv.php">
-            <button type="submit" class="btn btn-success">Exporter les Visites</button>
-        </form>
-    </div>
-    <form method="post" action="page_ajout_employes.php" target="_blank">
+    <form method="post" action="page_ajout_visites.php" target="_blank">
         <button class="position-absolute top-0 end-0 m-2 text-primary border-0 bg-transparent">
             <a class="btn btn-primary btn-lg position-fixed btn-flottant">
-                <i class="fas fa-user-plus"></i>Ajouter une exposition
+                <i class="fas fa-user-plus"></i>Ajouter une visite
             </a>
         </button>
     </form>
@@ -236,7 +246,7 @@ try {
 
 <div id="cardContainer">
     <div class="row row-cols-1 row-cols-md-4 g-4 justify-content-center">
-        <?php foreach ($tableauEmployes as $employe): ?>
+	    <?php foreach ($tableauVisites as $visite): ?>
             <div class="card shadow-sm border-0 h-100 position-relative me-3">
                 <!-- Icône crayon en haut à droite -->
                 <form method="post" action="page_modif_employes.php">
@@ -244,53 +254,60 @@ try {
                         <i class="fas fa-pencil-alt fs-4"></i>
                     </button>
                     <?php
-                    $nom = $employe['nom'];
-                    $prenom = $employe['prenom'];
-                    $telephone = $employe['numTel'];
-                    $idEmp = $employe['idEmploye'];
-                    $loginEmp = $employe['login'];
-                    echo '<input type="hidden" name="nom_employe" value="' . htmlentities($nom, ENT_QUOTES) . '">';
-                    echo '<input type="hidden" name="prenom_employe" value="' . htmlentities($prenom, ENT_QUOTES) . '">';
-                    echo '<input type="hidden" name="telephone_employe" value="' . htmlentities($telephone, ENT_QUOTES) . '">';
-                    echo '<input type="hidden" name="id_employe" value="' . htmlentities($idEmp, ENT_QUOTES) . '">';
-                    echo '<input type="hidden" name="login_employe" value="' . htmlentities($loginEmp, ENT_QUOTES) . '">';
+                    $idVisites = $visite['idVisite'];
+                    echo '<input type="hidden" name="id_Visite" value="' . htmlentities($idVisites, ENT_QUOTES) . '">';
 
                     ?>
                 </form>
 
                 <!-- Contenu de la card -->
                 <div class="card-body text-black rounded text-start">
-                    <span class="fs-5 fw-bold">Identifiant :</span> <?php echo($employe['idEmploye']) ?>
-                    <br><br><span class="fs-5 fw-bold">Nom :</span> <?php echo($employe['nom']) ?>
-                    <br><br><span class="fs-5 fw-bold">Prenom :</span> <?php echo($employe['prenom']) ?>
-                    <br><br><span class="fs-5 fw-bold">Telephone :</span> <?php echo($employe['numTel']) ?>
-                    <br><br><span class="fs-5 fw-bold">Login :</span> <?php echo($employe['login']) ?>
+                    <span class="fs-5 fw-bold">Identifiant :</span> <?php echo($visite['idVisite']) ?>
+                    <br><br><span class="fs-5 fw-bold">Date Visite :</span> <?php echo($visite['dateVisite']) ?>
+                    <br><br><span
+                            class="fs-5 fw-bold">Heure du Debut de la Visite :</span> <?php echo($visite['heureDebutVisite']) ?>
+                    <br><br><span
+                            class="fs-5 fw-bold">Intitule de la Visite :</span> <?php echo($visite['intituleVisite']) ?>
+                    <br><br><span
+                            class="fs-5 fw-bold">Numéro de Téléphone de la Visite :</span> <?php echo($visite['numTelVisite']) ?>
+                    <br><br><span
+                            class="fs-5 fw-bold">Identifiant de l'Exposition :</span> <?php echo($visite['idExposition']) ?>
+                    <br><br><span
+                            class="fs-5 fw-bold">Intitule de l'Exposition :</span> <?php echo($visite['intitule']) ?>
+                    <br><br><span
+                            class="fs-5 fw-bold">Nom du Conférencier :</span> <?php echo($visite['nomConferencier']) ?>
+                    <br><br><span
+                            class="fs-5 fw-bold">Prenom du Conférencier :</span> <?php echo($visite['prenomConferencier']) ?>
+
+
                     <br><br>
                 </div>
 
                 <!-- Bouton poubelle avec modal -->
-                <a href="#" class="position-absolute bottom-0 end-0 m-2 text-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?php echo $idEmp; ?>">
+                <a href="#" class="position-absolute bottom-0 end-0 m-2 text-danger" data-bs-toggle="modal"
+                   data-bs-target="#deleteModal<?php echo $visite['idVisite']; ?>">
                     <i class="fas fa-trash-alt fs-4"></i>
                 </a>
 
-                <!-- Delete Confirmation Modal -->
-                <div class="modal fade" id="deleteModal<?php echo $idEmp; ?>" tabindex="-1" aria-labelledby="deleteModalLabel<?php echo $idEmp; ?>" aria-hidden="true">
+                <!-- Modal de confirmation de suppression -->
+                <div class="modal fade" id="deleteModal<?php echo $visite['idVisite']; ?>" tabindex="-1"
+                     aria-labelledby="deleteModalLabel<?php echo $visite['idVisite']; ?>" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="deleteModalLabel<?php echo $idEmp; ?>">Confirmation de suppression</h5>
+                                <h5 class="modal-title" id="deleteModalLabel<?php echo $visite['idVisite']; ?>">
+                                    Confirmation de suppression</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                             </div>
                             <div class="modal-body">
-                                Êtes-vous sûr de vouloir supprimer cet employé ?
+                                Êtes-vous sûr de vouloir supprimer cette visite ?
                             </div>
                             <div class="modal-footer">
-                                <!-- Bouton Annuler -->
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                                <!-- Bouton Confirmer -->
-                                <form method="post" action="page_employes.php?page=1">
-                                    <input type="hidden" name="actionSuppression" value="supprimerEmploye">
-                                    <input type="hidden" name="id_employe" value="<?php echo htmlentities($employe['idEmploye'], ENT_QUOTES); ?>">
+                                <form method="post" action="page_visites.php?page=1">
+                                    <input type="hidden" name="actionSuppression" value="supprimerVisite">
+                                    <input type="hidden" name="idVisite"
+                                           value="<?php echo htmlentities($visite['idVisite'], ENT_QUOTES); ?>">
                                     <button type="submit" class="btn btn-danger">Confirmer</button>
                                 </form>
                             </div>
@@ -307,52 +324,54 @@ try {
             <thead>
             <tr>
                 <th class="text-center">Identifiant</th>
-                <th class="text-center">Nom</th>
-                <th class="text-center">Prénom</th>
+                <th class="text-center">Date Visite</th>
+                <th class="text-center">Heure de Début</th>
+                <th class="text-center">Intitule</th>
                 <th class="text-center">Numéro de Téléphone</th>
-                <th class="text-center">Login</th>
+                <th class="text-center">Identifiant de l'Exposition</th>
+                <th class="text-center">Intitule de l'Exposition</th>
+                <th class="text-center">Nom du conferencier</th>
+                <th class="text-center">Prenom du conferencier</th>
 
                 <th class="text-center">Modifier</th>
                 <th class="text-center">Supprimer</th>
             </tr>
             </thead>
             <tbody>
-            <?php foreach ($tableauEmployes as $employe): ?>
+            <?php foreach ($tableauVisites as $visite): ?>
                 <tr>
-                    <td><?php echo($employe['idEmploye']) ?></td>
-                    <td><?php echo($employe['nom']) ?></td>
-                    <td><?php echo($employe['prenom']) ?></td>
-                    <td><?php echo($employe['numTel']) ?></td>
-                    <td><?php echo($employe['login']) ?></td>
+                    <td><?php echo($visite['idVisite']) ?></td>
+                    <td><?php echo($visite['dateVisite']) ?></td>
+                    <td><?php echo($visite['heureDebutVisite']) ?></td>
+                    <td><?php echo($visite['intituleVisite']) ?></td>
+                    <td><?php echo($visite['numTelVisite']) ?></td>
+                    <td><?php echo($visite['idExposition']) ?></td>
+                    <td><?php echo($visite['intitule']) ?></td>
+                    <td><?php echo($visite['nomConferencier']) ?></td>
+                    <td><?php echo($visite['prenomConferencier']) ?></td>
                     <td class="text-center">
                         <form method="post" action="page_modif_employes.php">
                             <button class="btn btn-link text-primary p-0">
                                 <i class="fas fa-pencil-alt fs-4"></i>
                             </button>
                             <?php
-                            $nom = $employe['nom'];
-                            $prenom = $employe['prenom'];
-                            $telephone = $employe['numTel'];
-                            $idEmp = $employe['idEmploye'];
-                            $loginEmp = $employe['login'];
-                            echo '<input type="hidden" name="nom_employe" value="' . htmlentities($nom, ENT_QUOTES) . '">';
-                            echo '<input type="hidden" name="prenom_employe" value="' . htmlentities($prenom, ENT_QUOTES) . '">';
-                            echo '<input type="hidden" name="telephone_employe" value="' . htmlentities($telephone, ENT_QUOTES) . '">';
-                            echo '<input type="hidden" name="id_employe" value="' . htmlentities($idEmp, ENT_QUOTES) . '">';
-                            echo '<input type="hidden" name="login_employe" value="' . htmlentities($loginEmp, ENT_QUOTES) . '">';
                             ?>
                         </form>
                     </td>
                     <td class="text-center">
-                        <a href="#" class="text-danger" data-bs-toggle="modal" data-bs-target="#deleteModalTableau<?php echo $idEmp; ?>">
+                        <a href="#" class="text-danger" data-bs-toggle="modal"
+                           data-bs-target="#deleteModalTableau<?php echo $visite['idVisite']; ?>">
                             <i class="fas fa-trash-alt fs-4"></i>
                         </a>
                         <!-- Delete Confirmation Modal -->
-                        <div class="modal fade" id="deleteModalTableau<?php echo $idEmp; ?>" tabindex="-1" aria-labelledby="deleteModalLabel<?php echo $idEmp; ?>" aria-hidden="true">
+                        <div class="modal fade" id="deleteModalTableau<?php echo $visite['idVisite']; ?>" tabindex="-1"
+                             aria-labelledby="deleteModalLabel<?php echo $visite['idVisite']; ?>" aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel<?php echo $idEmp; ?>">Confirmation de suppression</h5>
+                                        <h5 class="modal-title"
+                                            id="deleteModalLabel<?php echo $visite['idVisite'];; ?>">Confirmation de
+                                            suppression</h5>
                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
                                     </div>
                                     <div class="modal-body">
@@ -362,7 +381,8 @@ try {
                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
                                         <form method="post" action="page_employes.php?page=1">
                                             <input type="hidden" name="actionSuppression" value="supprimerEmploye">
-                                            <input type="hidden" name="id_employe" value="<?php echo htmlentities($employe['idEmploye'], ENT_QUOTES); ?>">
+                                            <input type="hidden" name="id_employe"
+                                                   value="<?php echo htmlentities($visite['idVisite'], ENT_QUOTES); ?>">
                                             <button type="submit" class="btn btn-danger">Confirmer</button>
                                         </form>
                                     </div>
@@ -391,9 +411,13 @@ try {
                 </div>
                 <div class="modal-body">
                     <?php if ($_SESSION["suppressionOk"]): ?>
-                        <p class="text-success">L'employé numéro <strong><?php echo htmlentities($_SESSION["idEmployeSupprimer"], ENT_QUOTES); ?></strong> a bien été supprimé.</p>
+                        <p class="text-success">La Visite numéro
+                            <strong><?php echo htmlentities($_SESSION["idVisiteSupprime"], ENT_QUOTES); ?></strong> a
+                            bien été supprimée.</p>
                     <?php else: ?>
-                        <p class="text-danger">L'employé numéro <strong><?php echo htmlentities($_SESSION["idEmployeSupprimer"], ENT_QUOTES); ?></strong> n'a pas pu être supprimé.</p>
+                        <p class="text-danger">La Visite numéro
+                            <strong><?php echo htmlentities($_SESSION["idVisiteSupprime"], ENT_QUOTES); ?></strong> n'a
+                            pas pu être supprimée.</p>
                     <?php endif; ?>
                 </div>
                 <div class="modal-footer">
