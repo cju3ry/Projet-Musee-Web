@@ -9,7 +9,7 @@ if (!isset($_SESSION['loginAdmin'])) {
 
 try {
 	$pdo = connecterBd();
-	$stmt = $pdo->query("
+    $sql = "
         SELECT
             exposition.idExposition AS Ident,
             exposition.intitule AS Intitulé,
@@ -23,7 +23,8 @@ try {
         FROM exposition
         LEFT JOIN motscle ON exposition.idExposition = motscle.idExposition
         GROUP BY exposition.idExposition, exposition.intitule, exposition.periodeDebut, exposition.periodeFin, exposition.nombreOeuvres, exposition.resume, exposition.debutExpoTemp, exposition.finExpoTemp
-    ");
+    ";
+	$stmt = $pdo->prepare($sql);
 	$expositions = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 	header('Content-Type: text/csv');
