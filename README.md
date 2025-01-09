@@ -1,7 +1,7 @@
 # Description du projet
 ## Objectifs de la SAÉ
 
-Dans cette SAÉ, nous devions faire la refonte complète du site Internet permettant d’effectuer la réservation des visites.
+Ce projet consiste à la création d'un site web hébergé et de sa base de données hébergée par nos soins. Le site se trouve dans la continuité de l'application Java car il permet la création, suppression et modification des différentes fonctionnalités proposées au musée. Il fait également le lien avec l'application Java par la création de fichiers CSV compatibles avec l'application java.
 
 ## Contributeurs de cette SAÉ :
 
