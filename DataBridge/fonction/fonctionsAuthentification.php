@@ -1,7 +1,7 @@
 <?php
 function connecterBd() {
     $host = 'localhost';
-    $db = "u842999230_DataBridge";
+    $db = "u842999230_DataBridge"; // nom de la base de donnée
     $user = 'u842999230_DataBridgeUser';
     $pass = '@rI0grw00d_qUeens$@';
     $charset = 'utf8mb4';
@@ -11,18 +11,21 @@ function connecterBd() {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
         PDO::ATTR_EMULATE_PREPARES => false
     ];
+    
     try {
         $pdo = new PDO($dsn, $user, $pass, $options);
     } catch (PDOException $e) {
         throw new PDOException($e->getMessage(), (int)$e->getCode());
     }
+    
     return $pdo;
 }
 
 function loginEmploye($pdo, $login, $pwd) {
 
-    $pwd = MD5($pwd);
-
+    $pwd = MD5($pwd); // encodage en MD5
+    
+    // requêtes de login employé
     $query = 'SELECT login FROM login';
 
     $query .= ' WHERE login = :login';
@@ -50,8 +53,9 @@ function loginEmploye($pdo, $login, $pwd) {
 
 function loginAdmin($pdo, $login, $pwd) {
 
-    $pwd = MD5($pwd);
-
+    $pwd = MD5($pwd); // encodage en MD5
+    
+    // requêtes de login administrateur
     $query = 'SELECT loginAdmin FROM admin';
 
     $query .= ' WHERE loginAdmin = :login';
@@ -77,6 +81,7 @@ function loginAdmin($pdo, $login, $pwd) {
     return $tableLogAdmin;
 }
 
+// récupération de l'id de l'employé en fonction de son login
 function getIdEmploye($pdo, $login) {
     $requete = 'SELECT idEmploye FROM login WHERE login LIKE :login';
 
@@ -95,6 +100,7 @@ function getIdEmploye($pdo, $login) {
     return $tab;
 }
 
+// synchronisation de l'id de l'employé avec la base
 function setIdEmploye($pdo, $idEmploye) {
     $requete = 'CALL SetCurrentUser(:idEmploye)';
 
