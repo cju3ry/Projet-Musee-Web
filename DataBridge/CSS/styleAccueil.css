@@ -36,9 +36,10 @@ footer {
 }
 
 
-/* Personnalisation de la sidebar */
+/* === Styles Sidebar (Offcanvas) === */
 .offcanvas-start {
-    background-color: rgba(255, 255, 255, 0.2);
+    /* Personnalisation de la sidebar */
+    background-color: rgba(0, 0, 0, 0.2); /* Noir avec 20% d'opacité */
     color: #fff;
 }
 

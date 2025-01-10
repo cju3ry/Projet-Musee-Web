@@ -1,0 +1,369 @@
+/* === Styles Généraux === */
+body {
+    /* Définition de la couleur de fond du body et de l'image d'arrière-plan */
+    background-image: url('../images/imageIndex.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-attachment: fixed;
+}
+
+/* === Styles Navbar === */
+.navbar-brand img {
+    /* Personnalisation de l'image du logo */
+    width: 50px;
+    height: auto;
+}
+
+.navbar-transparent {
+    /* Effet de transparence et de flou pour la navbar */
+    background-color: rgba(0, 0, 0, 0.2); /* Noir avec 20% d'opacité */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2); /* Bordure subtile */
+}
+
+.navbar-toggler {
+    /* Rendre le bouton hamburger transparent */
+    width: 50px;
+    height: 50px;
+    background-color: transparent;
+    border: none;
+}
+
+/* === Styles Sidebar (Offcanvas) === */
+.offcanvas-start {
+    /* Personnalisation de la sidebar */
+    background-color: rgba(0, 0, 0, 0.2); /* Noir avec 20% d'opacité */
+    color: #fff;
+    transition: transform 0.3s ease, visibility 0.3s ease;
+    transform: translateX(-100%);
+    visibility: hidden;
+}
+
+.offcanvas-start.show {
+    transform: translateX(0);
+    visibility: visible;
+}
+
+
+.offcanvas-header {
+    border-bottom: 1px solid #ffff;
+}
+
+.offcanvas-body {
+    padding-top: 20px;
+}
+
+.offcanvas-body ul li a {
+    /* Liens de la sidebar */
+    color: #ecf0f1;
+    font-size: 1.1rem;
+    padding: 10px;
+    display: block;
+    text-decoration: none;
+}
+
+.offcanvas-body ul li a:hover {
+    background-color: #34495e;
+    border-radius: 4px;
+}
+
+.offcanvas-title {
+    font-size: 1.5rem;
+}
+
+.btn-close {
+    /* Bouton pour fermer la sidebar */
+    filter: invert(1);
+}
+
+/* === Sous-menus dans la sidebar === */
+.submenu-icon {
+    /* Icône pour les sous-menus */
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+}
+
+.submenu-icon.rotate {
+    /* Rotation de l'icône lorsque le sous-menu est ouvert */
+    transform: rotate(90deg);
+}
+
+.submenu {
+    /* Masquer les sous-menus par défaut */
+    display: none;
+    padding-left: 20px;
+}
+
+/* === Styles Footer === */
+footer {
+    /* Footer centré et avec une couleur plus claire */
+    margin-top: 20px;
+    text-align: center;
+    color: #6c757d;
+}
+
+/* === Boutons flottants === */
+.btn-flottant {
+    /* Bouton flottant positionné en bas à droite */
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-decoration: none;
+    color: #fff;
+    background-color: #007bff;
+    white-space: nowrap;
+}
+
+/* === Styles pour affichage en tableau === */
+.table-view .card {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px;
+    border: 1px solid #ddd;
+}
+
+.table-view .card-body {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.table-view .card-body span {
+    margin-right: 20px;
+}
+
+/* === Bouton d'interaction (btn) === */
+#btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 3px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+#btn:hover ion-icon {
+    /* Animation du bouton au survol */
+    animation: upAndDown 0.3s alternate infinite;
+}
+
+/* icône pour déplier les filtres */
+@keyframes upAndDown {
+    0% {
+        transform: translateY(3px);
+    }
+    100% {
+        transform: translateY(-3px);
+    }
+}
+
+/* === Conteneur de détails === */
+#details {
+    margin-top: 20px;
+    line-height: 1.6;
+    font-weight: bold;
+    text-align: justify;
+    height: 0;
+    overflow: hidden;
+}
+
+.details-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+}
+
+/* === Switch Toggle === */
+.switch {
+    position: relative;
+    width: 60px;
+    height: 30px;
+}
+
+.switch input {
+    display: none;
+}
+
+.switch label {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #ddd;
+    border-radius: 50px;
+    position: absolute;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.switch label:before {
+    content: '';
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: white;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: 0.3s;
+}
+
+.switch input:checked + label {
+    background-color: #3585CD;
+}
+
+.switch input:checked + label:before {
+    transform: translateX(30px);
+}
+
+/* === Conteneur de cartes === */
+#cardContainer {
+    padding: 20px; /* Ajout d'espace autour */
+    display: block; /* Vignette visible par défaut */
+}
+
+#tableau {
+    display: none; /* Tableau caché par défaut */
+}
+
+.cardAffichage {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 350px;
+    width: 25%;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background-color: #fff;
+    overflow: hidden;
+    transition: all 0.3s ease-in-out;
+}
+
+.cardAffichage-body {
+    flex-grow: 1;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Empêche le débordement */
+    text-align: justify; /* Alignement justifié */
+    white-space: normal; /* Permet les retours à la ligne */
+}
+
+/* Applique aux zones de contenu supplémentaire */
+.cardAffichage .extra-content {
+    display: none; /* Contenu caché par défaut */
+    word-wrap: break-word; /* Retour à la ligne pour les mots trop longs */
+    word-break: break-word; /* Gestion des longues chaînes sans espaces */
+    overflow-wrap: break-word; /* Compatibilité supplémentaire */
+    white-space: normal; /* Permet de revenir à la ligne */
+    max-width: 100%; /* Limite la largeur à celle du conteneur parent */
+    line-height: 1.6; /* Ajuste l'espacement entre les lignes */
+}
+
+.cardAffichage .toggle-button {
+    cursor: pointer;
+    color: #007bff;
+    border: none;
+    background: transparent;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* === Styles du tableau === */
+.table-style {
+    width: 80%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1rem;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.table-style thead tr {
+    background-color: #007BFF;
+    color: #ffffff;
+    text-align: left;
+}
+
+.table-style th,
+.table-style td {
+    padding: 12px 15px;
+}
+
+.table-style tbody tr:nth-child(odd) {
+    background-color: #f9f9f9;
+}
+
+.table-style tbody tr:nth-child(even) {
+    background-color: #f1f1f1;
+}
+
+.table-style tbody tr:hover {
+    background-color: #d0e8ff;
+}
+
+/* === Modale === */
+.modal-backdrop {
+    z-index: 1040;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal {
+    z-index: 1050;
+}
+
+/* === Détails supplémentaires === */
+.details-boxx {
+    max-width: 300px;
+    margin: 0 auto;
+    background-color: rgba(0, 0, 0, 0.2);
+    
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+#cardContainer .row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.table-style td.resume {
+    white-space: normal; /* Permet les retours à la ligne */
+    word-wrap: break-word; /* Coupe les mots trop longs */
+    overflow-wrap: break-word; /* Alternative pour compatibilité */
+    max-width: 200px; /* Limite la largeur pour forcer les retours à la ligne */
+}
+
+/* === Assurez-vous que l'offcanvas est devant tout === */
+.offcanvas {
+    z-index: 1050 !important; /* Plus élevé que les autres éléments Bootstrap */
+}
+
+/* Optionnel : si des éléments spécifiques sont devant l'offcanvas, réglez leur z-index */
+body.offcanvas-open .navbar,
+body.offcanvas-open .container,
+body.offcanvas-open .footer {
+    z-index: 1; /* Envoyez-les en arrière-plan */
+}
