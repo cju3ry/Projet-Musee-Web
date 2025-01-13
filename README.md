@@ -37,3 +37,5 @@ Ce projet consiste à la création d'un site web hébergé et de sa base de donn
 Board : https://github.com/users/cju3ry/projects/7
   
 Drive : https://drive.google.com/drive/folders/0AMKNMZuqF6_-Uk9PVA
+
+Point supplémentaire : pendant les vacances, nous avons mal assuré la gestion des codes source (nous l'avons fait directement avec l'outil proposé par notre hébergeur) car la communication entre les membres de l'équipe a été difficile durant les vacances de Noël. C'est pour cela qu'une remise à niveau a été faite au retour des vacances, pour être sûr que les dernières versions des codes source soient bien présentes.
